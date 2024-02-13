@@ -5,7 +5,7 @@ import {updateAccount} from "./controllers/updateAccount";
 import {isUserHome} from "./controllers/isUserHome";
 
 const app = express();
-const port = 5555;
+const port = 3000;
 
 app.use(json())
 
