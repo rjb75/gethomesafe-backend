@@ -1,6 +1,7 @@
 import {Request, Response} from "express";
 import {getUser} from "../services/getUser";
 import {distanceBetweenCoordinates} from "../services/distanceBetweenCoordinates";
+import {validationResult} from "express-validator";
 
 interface expectedQuery {
     _id: string,
@@ -9,19 +10,18 @@ interface expectedQuery {
 }
 
 export const isUserHome = async (req: Request<{},{},{}, expectedQuery>, res: Response) => {
-    const {_id, currentLat, currentLong} = req.query;
-
-    if (!_id || !currentLat || !currentLong) {
-        res.status(400).send("Not enough args");
-        return;
+    const valResult = validationResult(req);
+    if (!valResult.isEmpty()) {
+        return res.status(300).send(valResult.array());
     }
+
+    const {_id, currentLat, currentLong} = req.query;
 
     try{
         const user = await getUser(_id);
         const {lat: homeLat, long: homeLong} = user.address.coordinates;
 
         const distance = distanceBetweenCoordinates(homeLat, homeLong, currentLat, currentLong);
-        console.log(distance)
         res.status(200).send({isUserHome: distance < 30});
     } catch (e) {
         res.status(500).send("Server Error");
