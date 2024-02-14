@@ -1,5 +1,4 @@
-import {Db, MongoClient, MongoCredentials, ServerApiVersion} from "mongodb";
-import {User} from "./User";
+import {Db, MongoClient, ServerApiVersion} from "mongodb";
 
 export const dbClient =  (() => {
     let client: Db;
