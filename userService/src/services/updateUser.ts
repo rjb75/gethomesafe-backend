@@ -1,6 +1,5 @@
 import { dbClient } from '../models/mongo'
 import {Address, User} from "../models/User";
-import {MongoError} from "mongodb";
 
 export const updateUser = async (_id: string, displayName?: string, address?: Address): Promise<boolean> => {
     const database = dbClient.getClient();
