@@ -132,3 +132,6 @@ dist
 
 # Other
 .idea
+
+# Firebase Config
+firebase-config.json
