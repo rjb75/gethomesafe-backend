@@ -1,0 +1,18 @@
+version: '1.0'
+
+services:
+  userService:
+    image: node:18-alpine
+    command: sh -c "npm install && npm start"
+    ports:
+      - 127.0.0.1:4000:4000
+    working_dir: /src
+    volumes:
+      - ./:/src
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_CONNECTION_STRING=${MONGO_URL}
+
+volumes:
+  userData:
