@@ -3,9 +3,7 @@
   "services": {
     "testService": {
       "name": "testService",
-      "hosts": [
-        "localhost"
-      ],
+      "hosts": ["localhost"],
       "port": 1234,
       "protocol": "http",
       "routes": [
@@ -25,9 +23,7 @@
     },
     "userService": {
       "name": "userService",
-      "hosts": [
-        "localhost"
-      ],
+      "hosts": ["localhost"],
       "port": 3000,
       "protocol": "http",
       "routes": [
