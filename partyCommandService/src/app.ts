@@ -10,7 +10,7 @@ const port = 5000;
 
 app.use(json());
 
-app.get("/api/create-party", createPartyValidationSchema, createParty);
+app.post("/api/create-party", createPartyValidationSchema, createParty);
 app.get("/api/join-party", joinPartyValidationSchema, joinParty);
 
 app.listen(port, () => {
