@@ -9,8 +9,10 @@ import (
 	"github.com/rjb75/gethomesafe-backend/gateway/config"
 )
 
-func (g *Gateway) Proxy(r *config.Route, s config.Service) gin.HandlerFunc {
+func (g *Gateway) Proxy(r config.Route, s config.Service) gin.HandlerFunc {
+	fmt.Println(r, s.Host)
 	return func(c *gin.Context) {
+		fmt.Println("Proxying request to", s.Host[0], r.Path)
 		c.Request.URL.Host = s.Host[0]
 		c.Request.URL.Scheme = "http"
 		c.Request.Header.Del("Authorization")
@@ -47,6 +49,12 @@ func (g *Gateway) Proxy(r *config.Route, s config.Service) gin.HandlerFunc {
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
+		}
+
+		if resp.Header.Get("x-auth-token") != "" {
+			fmt.Println("Setting token", resp.Header.Get("x-auth-token"))
+			c.SetCookie("token", resp.Header.Get("x-auth-token"), 60*60*24, "/", "localhost", false, true)
+			c.Header("Authorization", resp.Header.Get("x-auth-token"))
 		}
 
 		fmt.Println(body, resp.StatusCode, resp.Header.Get("Content-Type"))

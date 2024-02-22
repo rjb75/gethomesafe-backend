@@ -18,17 +18,27 @@ func (g *Gateway) RegisterRoutes() error {
 	for _, service := range g.config.Services {
 		for _, route := range service.Routes {
 			if route.Authenticated {
-				g.G.Use(g.F.AuthMiddleware())
-			}
-			switch route.Method {
-			case "GET":
-				g.G.GET(route.GatewayPath, g.Proxy(&route, service))
-			case "POST":
-				g.G.POST(route.GatewayPath, g.Proxy(&route, service))
-			case "PUT":
-				g.G.PUT(route.GatewayPath, g.Proxy(&route, service))
-			case "DELETE":
-				g.G.DELETE(route.GatewayPath, g.Proxy(&route, service))
+				switch route.Method {
+				case "GET":
+					g.G.GET(route.GatewayPath, g.F.AuthMiddleware(), g.Proxy(route, service))
+				case "POST":
+					g.G.POST(route.GatewayPath, g.F.AuthMiddleware(), g.Proxy(route, service))
+				case "PUT":
+					g.G.PUT(route.GatewayPath, g.F.AuthMiddleware(), g.Proxy(route, service))
+				case "DELETE":
+					g.G.DELETE(route.GatewayPath, g.F.AuthMiddleware(), g.Proxy(route, service))
+				}
+			} else {
+				switch route.Method {
+				case "GET":
+					g.G.GET(route.GatewayPath, g.Proxy(route, service))
+				case "POST":
+					g.G.POST(route.GatewayPath, g.Proxy(route, service))
+				case "PUT":
+					g.G.PUT(route.GatewayPath, g.Proxy(route, service))
+				case "DELETE":
+					g.G.DELETE(route.GatewayPath, g.Proxy(route, service))
+				}
 			}
 		}
 	}
