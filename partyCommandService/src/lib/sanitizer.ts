@@ -5,4 +5,8 @@ const nameSanitizer = (value: string) => {
   }
 };
 
-export { nameSanitizer };
+const inviteCodeSanitizer = (value: string) => {
+  return Number.parseInt(value);
+};
+
+export { nameSanitizer, inviteCodeSanitizer };

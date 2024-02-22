@@ -1,5 +1,5 @@
 import { checkSchema } from "express-validator";
-import { nameSanitizer } from "../lib/sanatizer";
+import { nameSanitizer } from "../lib/sanitizer";
 
 export const createPartyValidationSchema = checkSchema({
   name: {
