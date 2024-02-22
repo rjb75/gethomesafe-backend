@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 import { CreatePartyRequestBody } from "../controllers/createParty";
 import { dbClient, PARTY_COLLECTION } from "../models/mongo";
 import { Party, User } from "../models/party.model";
+import { getUserInfo } from "./helper";
 
 type CreatePartyArgs = CreatePartyRequestBody;
 
@@ -19,7 +20,13 @@ export const createNewParty = async ({
     throw new Error("createParty - USER_SERVICE_URL not set");
   }
 
-  const userInfo = await getUserInfo(hostUserId);
+  let userInfo;
+  try {
+    userInfo = await getUserInfo(hostUserId);
+  } catch (e) {
+    console.log("createParty - Error on fetching user info: ", e);
+    throw e;
+  }
 
   const hostMemberInfo: User = {
     _id: userInfo._id,
@@ -54,6 +61,7 @@ export const createNewParty = async ({
     }
   } catch (e) {
     console.log("createParty - Error on inserting document: ", e);
+    throw e;
   }
 
   return partyData;
@@ -61,31 +69,4 @@ export const createNewParty = async ({
 
 const generateInviteCode = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
-};
-
-const getUserInfo = async (userId: string): Promise<User> => {
-  const userServiceUrl = process.env.USER_SERVICE_URL;
-  if (!userServiceUrl) {
-    throw new Error("getUserInfo - USER_SERVICE_URL not set");
-  }
-
-  let userInfo: User | undefined;
-  try {
-    const response = await fetch(
-      `${userServiceUrl}/api/getUserInfo?_id=${userId}`
-    );
-    userInfo = await response.json();
-
-    if (!userInfo) {
-      throw new Error("User not found");
-    }
-  } catch (e) {
-    console.log("getUserInfo - Error on fetching user info: ", e);
-  }
-
-  if (!userInfo) {
-    throw new Error("Failed to get user info");
-  }
-
-  return userInfo;
 };
