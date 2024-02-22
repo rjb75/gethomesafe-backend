@@ -6,6 +6,7 @@ import (
 
 func main() {
 	gateway := gateway.New()
+	gateway.InitFirebase()
 	gateway.Init()
 	err := gateway.LoadConfig("services.json")
 

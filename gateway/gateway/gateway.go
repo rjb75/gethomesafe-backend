@@ -1,10 +1,13 @@
 package gateway
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/rjb75/gethomesafe-backend/gateway/auth"
 	"github.com/rjb75/gethomesafe-backend/gateway/config"
 	"github.com/rjb75/gethomesafe-backend/gateway/utils"
+	"github.com/spf13/viper"
 )
 
 type Gateway struct {
@@ -26,6 +29,23 @@ func (g *Gateway) LoadConfig(filename string) error {
 
 	g.config = config.New()
 	err = g.config.Parse(data)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (g *Gateway) InitFirebase() error {
+	key := viper.GetString("FIREBASE_API_KEY")
+
+	if key == "" {
+		return fmt.Errorf("FIREBASE_API_KEY is not set")
+	}
+
+	g.F = auth.New()
+	err := g.F.Init(key)
 
 	if err != nil {
 		return err

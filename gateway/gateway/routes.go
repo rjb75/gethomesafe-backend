@@ -18,17 +18,17 @@ func (g *Gateway) RegisterRoutes() error {
 	for _, service := range g.config.Services {
 		for _, route := range service.Routes {
 			if route.Authenticated {
-				// TODO: implement auth middleware
+				g.G.Use(g.F.AuthMiddleware())
 			}
 			switch route.Method {
 			case "GET":
-				g.G.GET(route.Path, g.Proxy(&route, service))
+				g.G.GET(route.GatewayPath, g.Proxy(&route, service))
 			case "POST":
-				g.G.POST(route.Path, g.Proxy(&route, service))
+				g.G.POST(route.GatewayPath, g.Proxy(&route, service))
 			case "PUT":
-				g.G.PUT(route.Path, g.Proxy(&route, service))
+				g.G.PUT(route.GatewayPath, g.Proxy(&route, service))
 			case "DELETE":
-				g.G.DELETE(route.Path, g.Proxy(&route, service))
+				g.G.DELETE(route.GatewayPath, g.Proxy(&route, service))
 			}
 		}
 	}

@@ -12,20 +12,20 @@ type Firebase struct {
 	App *firebase.App
 }
 
-func New() {
-
+func New() *Firebase {
+	return &Firebase{}
 }
 
-func (f *Firebase) Init() {
-	credentials := "firebase-config.json"
-	opt := option.WithCredentialsFile(credentials)
+func (f *Firebase) Init(key string) error {
+	opt := option.WithAPIKey(key)
 	app, err := firebase.NewApp(context.Background(), nil, opt)
 
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	f.App = app
+	return nil
 }
 
 func (f *Firebase) verifyIDToken(idToken string) (string, error) {
@@ -49,14 +49,14 @@ func (f *Firebase) AuthMiddleware() gin.HandlerFunc {
 		idToken := c.GetHeader("Authorization")
 
 		if idToken == "" {
-			c.AbortWithStatus(401)
+			c.AbortWithStatusJSON(401, gin.H{"error": "Authorization header is required"})
 			return
 		}
 
 		uid, err := f.verifyIDToken(idToken)
 
 		if err != nil {
-			c.AbortWithStatus(401)
+			c.AbortWithStatusJSON(401, gin.H{"error": "Invalid token"})
 			return
 		}
 

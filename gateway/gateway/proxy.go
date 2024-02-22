@@ -19,6 +19,13 @@ func (g *Gateway) Proxy(r *config.Route, s config.Service) gin.HandlerFunc {
 		c.Request.Header.Del("X-User-Role")
 		c.Request.Header.Del("X-User-Permissions")
 
+		// set the id header
+		if r.Authenticated {
+			if _, ok := c.Get("uid"); ok {
+				c.Request.Header.Set("ID", c.GetString("uid"))
+			}
+		}
+
 		fmt.Println(s)
 
 		url := fmt.Sprintf("%s://%s:%d%s", s.Protocol, s.Host[0], s.Port, r.Path)
