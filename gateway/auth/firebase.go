@@ -16,9 +16,12 @@ func New() *Firebase {
 	return &Firebase{}
 }
 
-func (f *Firebase) Init(key string) error {
+func (f *Firebase) Init(key string, project string) error {
+	config := firebase.Config{
+		ProjectID: project,
+	}
 	opt := option.WithAPIKey(key)
-	app, err := firebase.NewApp(context.Background(), nil, opt)
+	app, err := firebase.NewApp(context.Background(), &config, opt)
 
 	if err != nil {
 		return err

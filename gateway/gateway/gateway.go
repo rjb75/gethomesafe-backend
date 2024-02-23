@@ -44,8 +44,14 @@ func (g *Gateway) InitFirebase() error {
 		return fmt.Errorf("FIREBASE_API_KEY is not set")
 	}
 
+	project := viper.GetString("FIREBASE_PROJECT_ID")
+
+	if project == "" {
+		return fmt.Errorf("FIREBASE_PROJECT_ID is not set")
+	}
+
 	g.F = auth.New()
-	err := g.F.Init(key)
+	err := g.F.Init(key, project)
 
 	if err != nil {
 		return err
