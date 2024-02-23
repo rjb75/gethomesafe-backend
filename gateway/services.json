@@ -1,0 +1,51 @@
+{
+  "port": 8080,
+  "services": {
+    "testService": {
+      "name": "testService",
+      "hosts": ["localhost"],
+      "port": 1234,
+      "protocol": "http",
+      "routes": [
+        {
+          "path": "/test",
+          "method": "GET",
+          "gatewayPath": "/test",
+          "authenticated": false
+        },
+        {
+          "path": "/test",
+          "method": "GET",
+          "gatewayPath": "/testauth",
+          "authenticated": true
+        }
+      ]
+    },
+    "userService": {
+      "name": "userService",
+      "hosts": ["localhost"],
+      "port": 3000,
+      "protocol": "http",
+      "routes": [
+        {
+          "path": "/api/signup",
+          "gatewayPath": "/api/signup",
+          "method": "POST",
+          "authenticated": false
+        },
+        {
+          "path": "/api/updateAccount",
+          "gatewayPath": "/api/updateAccount",
+          "method": "PUT",
+          "authenticated": true
+        },
+        {
+          "path": "/api/isUserHome",
+          "gatewayPath": "/api/isUserHome",
+          "method": "GET",
+          "authenticated": true
+        }
+      ]
+    }
+  }
+}
