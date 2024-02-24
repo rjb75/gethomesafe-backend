@@ -14,14 +14,9 @@ const doesUserExist = async (value: any) => {
 }
 
 export const signupValidationSchema = checkSchema({
-    '_id': {
-        notEmpty: { bail: true },
-        isString: { bail: true },
-        custom: {
-            options: doesUserExist,
-        }
-    },
     'displayName': { notEmpty: { bail: true }, isString: { bail: true } },
+    'email': { notEmpty: { bail: true }, isEmail: { bail: true } },
+    'password': { notEmpty: { bail: true }, isString: { bail: true } },
     'address.coordinates.lat': {
         notEmpty: { bail: true },
         isFloat: { bail: true },

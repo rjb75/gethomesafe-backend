@@ -1,0 +1,47 @@
+version: "3.6"
+
+services:
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - 8080:8080
+    depends_on:
+      - user-service
+      - test-service
+  user-service:
+    hostname: user-service
+    build:
+      context: ./userService
+      dockerfile: Dockerfile
+    volumes:
+      - .userService/:/src
+    env_file:
+      - .env
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_CONNECTION_STRING=${MONGO_URL}
+    expose:
+      - 3000
+  test-service:
+    hostname: test-service
+    build:
+      context: ./testService
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    expose:
+      - 1234
+  mongodb:
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    expose:
+      - 27017
+    volumes:
+      - userData:/data/db
+
+volumes:
+  userData:
