@@ -3,17 +3,17 @@ import {User} from "../models/User";
 import {validationResult} from "express-validator";
 import {getUser} from "../services/getUser";
 
-interface expectedQuery {
-    _id: string,
-}
-
-export const getUserInfo = (req: Request<{},{},{}, expectedQuery>, res: Response) => {
+export const getUserInfo = (req: Request, res: Response) => {
     const valResult = validationResult(req);
     if (!valResult.isEmpty()) {
         return res.status(300).send(valResult.array());
     }
 
-    const { _id } = req.query;
+    const _id = req.get("X-User-Id");
+    if (!_id) {
+        res.status(500).send("No user id provided");
+        return;
+    }
 
     getUser(_id).then((user: User) => {
         res.status(200).send(user);

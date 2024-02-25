@@ -6,13 +6,6 @@ const coordinateSanitizer = (value: any) => {
     return Number.parseFloat(value);
 }
 
-const doesUserExist = async (value: any) => {
-    const database = dbClient.getClient();
-    const collection = database.collection<User>("users");
-    const user = await collection.findOne({_id: value});
-    if (user) throw new Error("Duplicate id");
-}
-
 export const signupValidationSchema = checkSchema({
     'displayName': { notEmpty: { bail: true }, isString: { bail: true } },
     'email': { notEmpty: { bail: true }, isEmail: { bail: true } },

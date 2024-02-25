@@ -6,21 +6,7 @@ const coordinateSanitizer = (value: any) => {
     return Number.parseFloat(value);
 }
 
-const doesUserExist = async (value: any) => {
-    const database = dbClient.getClient();
-    const collection = database.collection<User>("users");
-    const user = await collection.findOne({_id: value});
-    if (!user) throw new Error("User Doesn't Exist");
-}
-
 export const updateAccountValidationSchema = checkSchema({
-    '_id': {
-        notEmpty: { bail: true },
-        isString: { bail: true },
-        custom: {
-            options: doesUserExist,
-        }
-    },
     'displayName': { optional: true, notEmpty: { bail: true }, isString: { bail: true } },
     'address.coordinates.lat': {
         optional: true,

@@ -15,7 +15,12 @@ export const isUserHome = async (req: Request<{},{},{}, expectedQuery>, res: Res
         return res.status(300).send(valResult.array());
     }
 
-    const {_id, currentLat, currentLong} = req.query;
+    const {currentLat, currentLong} = req.query;
+    const _id = req.get("X-User-Id");
+    if (!_id) {
+        res.status(500).send("No user id provided");
+        return;
+    }
 
     try{
         const user = await getUser(_id);
