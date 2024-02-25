@@ -17,14 +17,11 @@ func (g *Gateway) Proxy(r config.Route, s config.Service) gin.HandlerFunc {
 		c.Request.URL.Scheme = "http"
 		c.Request.Header.Del("Authorization")
 		c.Request.Header.Del("X-User-Id")
-		c.Request.Header.Del("X-User-Email")
-		c.Request.Header.Del("X-User-Role")
-		c.Request.Header.Del("X-User-Permissions")
 
 		// set the id header
 		if r.Authenticated {
 			if _, ok := c.Get("uid"); ok {
-				c.Request.Header.Set("ID", c.GetString("uid"))
+				c.Request.Header.Set("X-User-Id", c.GetString("uid"))
 			}
 		}
 
