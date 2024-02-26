@@ -15,12 +15,7 @@ export const createNewParty = async ({
 
   const collection = database.collection<Party>(PARTY_COLLECTION);
 
-  const userServiceUrl = process.env.USER_SERVICE_URL;
-  if (!userServiceUrl) {
-    throw new Error("createParty - USER_SERVICE_URL not set");
-  }
-
-  let userInfo;
+  let userInfo: User;
   try {
     userInfo = await getUserInfo(hostUserId);
   } catch (e) {
@@ -42,7 +37,7 @@ export const createNewParty = async ({
   const partyData: Party = {
     _id: new ObjectId(),
     name,
-    hostUserId: new ObjectId(hostUserId),
+    hostUserId,
     inviteCode: generateInviteCode(),
     qrCode: "",
     active: true,
@@ -61,7 +56,6 @@ export const createNewParty = async ({
     }
   } catch (e) {
     console.log("createParty - Error on inserting document: ", e);
-    throw e;
   }
 
   return partyData;

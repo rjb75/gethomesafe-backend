@@ -44,6 +44,32 @@
           "gatewayPath": "/api/isUserHome",
           "method": "GET",
           "authenticated": true
+        },
+        {
+          "path": "/api/getUserInfo",
+          "gatewayPath": "/api/getUserInfo",
+          "method": "GET",
+          "authenticated": false
+        }
+      ]
+    },
+    "partyCommandService": {
+      "name": "partyCommandService",
+      "hosts": ["party-command-service"],
+      "port": 5000,
+      "protocol": "http",
+      "routes": [
+        {
+          "path": "/api/create-party",
+          "gatewayPath": "/api/create-party",
+          "method": "POST",
+          "authenticated": false
+        },
+        {
+          "path": "/api/join-party",
+          "gatewayPath": "/api/join-party",
+          "method": "POST",
+          "authenticated": false
         }
       ]
     }

@@ -3,7 +3,7 @@ import { ObjectId } from "mongodb";
 export interface Party {
   _id: ObjectId;
   name: string;
-  hostUserId: ObjectId;
+  hostUserId: string;
   inviteCode: string;
   qrCode: string;
   active: boolean;
@@ -14,7 +14,7 @@ export interface Party {
 }
 
 export interface User {
-  _id: ObjectId;
+  _id: string;
   displayName: string;
   address: Address;
 }
