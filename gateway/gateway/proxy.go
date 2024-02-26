@@ -17,7 +17,6 @@ func (g *Gateway) Proxy(r config.Route, s config.Service) gin.HandlerFunc {
 		c.Request.URL.Scheme = "http"
 		c.Request.Header.Del("Authorization")
 		c.Request.Header.Del("X-User-Id")
-
 		// set the id header
 		if r.Authenticated {
 			if _, ok := c.Get("uid"); ok {
@@ -25,13 +24,18 @@ func (g *Gateway) Proxy(r config.Route, s config.Service) gin.HandlerFunc {
 			}
 		}
 
-		fmt.Println(s)
-
 		url := fmt.Sprintf("%s://%s:%d%s", s.Protocol, s.Host[0], s.Port, r.Path)
 		fmt.Println("Proxying request to", url)
 
 		query, _ := http.NewRequest(c.Request.Method, url, c.Request.Body)
 		query.Header = c.Request.Header
+		params := c.Request.URL.Query()
+		for k, v := range c.Request.URL.Query() {
+			for _, value := range v {
+				params.Add(k, value)
+			}
+		}
+		query.URL.RawQuery = params.Encode()
 		resp, err := http.DefaultClient.Do(query)
 
 		if err != nil {
