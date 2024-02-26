@@ -1,7 +1,7 @@
 import { User } from "../models/party.model";
 
 export const getUserInfo = async (userId: string): Promise<User> => {
-  const userServiceUrl = process.env.USER_SERVICE_URL;
+  const userServiceUrl = process.env.API_GATEWAY_URL;
   if (!userServiceUrl) {
     throw new Error("getUserInfo - USER_SERVICE_URL not set");
   }

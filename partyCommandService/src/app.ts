@@ -1,4 +1,4 @@
-import express, { json } from "express";
+import express, { json, Request, Response } from "express";
 import "dotenv/config";
 import { createPartyValidationSchema } from "./validators/createPartyValidation";
 import { createParty } from "./controllers/createParty";
@@ -12,6 +12,9 @@ app.use(json());
 
 app.post("/api/create-party", createPartyValidationSchema, createParty);
 app.get("/api/join-party", joinPartyValidationSchema, joinParty);
+app.get("/api/heartbeat", (req: Request, res: Response) =>
+  res.status(200).send()
+);
 
 app.listen(port, () => {
   console.log(`Party Command Service listening on port ${port}`);
