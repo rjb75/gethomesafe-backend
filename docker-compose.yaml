@@ -12,6 +12,8 @@ services:
     depends_on:
       - user-service
       - test-service
+      - party-query-service
+      - party-command-service
   user-service:
     hostname: user-service
     build:
@@ -20,6 +22,7 @@ services:
     volumes:
       - .userService/:/src
     env_file:
+      - ./userService/.env
       - .env
     depends_on:
       - mongodb
@@ -35,6 +38,7 @@ services:
     volumes:
       - .partyQueryService/:/src
     env_file:
+      - ./partyQueryService/.env
       - .env
     depends_on:
       - mongodb # We should maybe think about creating a different DB instance for the party query/command services. This way we clearly have multiple dbs.
@@ -42,6 +46,22 @@ services:
       - MONGO_CONNECTION_STRING=${MONGO_URL}
     expose:
       - 4000
+  party-command-service:
+    hostname: party-command-service
+    build:
+      context: ./partyCommandService
+      dockerfile: Dockerfile
+    volumes:
+      - .partyCommandService/:/src
+    env_file:
+      - ./partyCommandService/.env
+      - .env
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_CONNECTION_STRING=${MONGO_URL}
+    expose:
+      - 5000
   test-service:
     hostname: test-service
     build:
