@@ -44,6 +44,38 @@
           "gatewayPath": "/api/isUserHome",
           "method": "GET",
           "authenticated": true
+        },
+        {
+          "path": "/api/getUserInfo",
+          "gatewayPath": "/api/getUserInfo",
+          "method": "GET",
+          "authenticated": true
+        }
+      ]
+    },
+    "partyQueryService": {
+      "name": "partyQueryService",
+      "hosts": ["localhost"],
+      "port": 3000,
+      "protocol": "http",
+      "routes": [
+        {
+          "path": "/api/partyInvite",
+          "gatewayPath": "/api/partyInvite",
+          "method": "GET",
+          "authenticated": true
+        },
+        {
+          "path": "/api/parties",
+          "gatewayPath": "/api/parties",
+          "method": "GET",
+          "authenticated": true
+        },
+        {
+          "path": "/api/partyStatus",
+          "gatewayPath": "/api/partyStatus",
+          "method": "GET",
+          "authenticated": true
         }
       ]
     }

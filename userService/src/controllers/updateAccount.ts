@@ -10,8 +10,13 @@ export const updateAccount = (req: Request, res: Response) => {
     }
 
     const user: User = req.body;
+    const _id = req.get("X-User-Id");
+    if (!_id) {
+        res.status(500).send("No user id provided");
+        return;
+    }
 
-    updateUser(user._id, user.displayName, user.address).then(r => {
+    updateUser(_id, user.displayName, user.address).then(r => {
         res.status(200).send("User Updated");
     }).catch(e => {
         res.status(500).send(e.message);
