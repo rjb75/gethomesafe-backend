@@ -63,13 +63,13 @@
           "path": "/api/create-party",
           "gatewayPath": "/api/create-party",
           "method": "POST",
-          "authenticated": false
+          "authenticated": true
         },
         {
           "path": "/api/join-party",
           "gatewayPath": "/api/join-party",
           "method": "POST",
-          "authenticated": false
+          "authenticated": true
         }
       ]
     }
