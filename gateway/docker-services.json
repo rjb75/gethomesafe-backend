@@ -72,6 +72,32 @@
           "authenticated": true
         }
       ]
+    },
+    "partyQueryService": {
+      "name": "partyQueryService",
+      "hosts": ["party-query-service"],
+      "port": 4000,
+      "protocol": "http",
+      "routes": [
+        {
+          "path": "/api/partyInvite",
+          "gatewayPath": "/api/partyInvite",
+          "method": "GET",
+          "authenticated": false
+        },
+        {
+          "path": "/api/parties",
+          "gatewayPath": "/api/parties",
+          "method": "GET",
+          "authenticated": false
+        },
+        {
+          "path": "/api/partyStatus",
+          "gatewayPath": "/api/partyStatus",
+          "method": "GET",
+          "authenticated": false
+        }
+      ]
     }
   }
 }
