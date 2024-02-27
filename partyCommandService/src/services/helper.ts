@@ -1,16 +1,20 @@
 import { User } from "../models/party.model";
 
 export const getUserInfo = async (userId: string): Promise<User> => {
-  const userServiceUrl = process.env.API_GATEWAY_URL;
-  if (!userServiceUrl) {
+  const apiGatewayUrl = process.env.API_GATEWAY_URL;
+  if (!apiGatewayUrl) {
     throw new Error("getUserInfo - USER_SERVICE_URL not set");
   }
 
   let userInfo: User | undefined;
   try {
-    const response = await fetch(
-      `${userServiceUrl}/api/getUserInfo?_id=${userId}`
-    );
+    const response = await fetch(`${apiGatewayUrl}/api/getUserInfo`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-User-Id": userId,
+      },
+    });
     userInfo = await response.json();
 
     if (!userInfo) {
