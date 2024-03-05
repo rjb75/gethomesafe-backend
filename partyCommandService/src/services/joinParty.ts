@@ -1,25 +1,22 @@
 import { JoinPartyRequestBody } from "../controllers/joinParty";
 import { PARTY_COLLECTION, dbClient } from "../models/mongo";
 import { Party, User } from "../models/party.model";
-import { getUserInfo } from "./helper";
-
 type JoinPartyArgs = JoinPartyRequestBody;
 
 export const addMemberToParty = async ({
   inviteCode,
   userId,
+  userDisplayName,
 }: JoinPartyArgs): Promise<Party> => {
   const database = dbClient.getClient();
 
   const collection = database.collection<Party>(PARTY_COLLECTION);
 
-  let userInfo: User;
-  try {
-    userInfo = await getUserInfo(userId);
-  } catch (e) {
-    console.log("addMemberToParty - Error on fetching user info: ", e);
-    throw e;
-  }
+  const userInfo: User = {
+    _id: userId,
+    displayName: userDisplayName,
+    isHome: false,
+  };
 
   try {
     const updatedParty = await collection.findOneAndUpdate(

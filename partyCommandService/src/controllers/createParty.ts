@@ -6,20 +6,26 @@ export interface CreatePartyRequestBody {
   name: string;
   endTime?: string;
   hostUserId: string;
+  hostDisplayName: string;
 }
 
 export const createParty = async (
   req: Request<{}, {}, CreatePartyRequestBody, {}>,
   res: Response
 ) => {
-  const { name, endTime, hostUserId } = req.body;
+  const { name, endTime, hostUserId, hostDisplayName } = req.body;
   const valResult = validationResult(req);
   if (!valResult.isEmpty()) {
     return res.status(300).send(valResult.array());
   }
 
   try {
-    const partyData = await createNewParty({ name, endTime, hostUserId });
+    const partyData = await createNewParty({
+      name,
+      endTime,
+      hostUserId,
+      hostDisplayName,
+    });
 
     res.status(201).json(partyData);
   } catch (e) {

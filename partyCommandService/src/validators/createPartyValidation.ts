@@ -26,4 +26,16 @@ export const createPartyValidationSchema = checkSchema({
     },
     errorMessage: "Host user ID must be a string with length between 1 and 255",
   },
+  hostDisplayName: {
+    in: ["body"],
+    isString: true,
+    isLength: {
+      options: { min: 1, max: 255 },
+    },
+    customSanitizer: {
+      options: nameSanitizer,
+    },
+    errorMessage:
+      "Host display name must be a string with length between 1 and 255",
+  },
 });

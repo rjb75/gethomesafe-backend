@@ -2,7 +2,6 @@ import { ObjectId } from "mongodb";
 import { CreatePartyRequestBody } from "../controllers/createParty";
 import { dbClient, PARTY_COLLECTION } from "../models/mongo";
 import { Party, User } from "../models/party.model";
-import { getUserInfo } from "./helper";
 
 type CreatePartyArgs = CreatePartyRequestBody;
 
@@ -10,28 +9,16 @@ export const createNewParty = async ({
   name,
   endTime,
   hostUserId,
+  hostDisplayName,
 }: CreatePartyArgs): Promise<Party> => {
   const database = dbClient.getClient();
 
   const collection = database.collection<Party>(PARTY_COLLECTION);
 
-  let userInfo: User;
-  try {
-    userInfo = await getUserInfo(hostUserId);
-  } catch (e) {
-    console.log("createParty - Error on fetching user info: ", e);
-    throw e;
-  }
-
   const hostMemberInfo: User = {
-    _id: userInfo._id,
-    displayName: userInfo.displayName,
-    address: {
-      coordinates: {
-        lat: userInfo.address.coordinates.lat,
-        long: userInfo.address.coordinates.long,
-      },
-    },
+    _id: hostUserId,
+    displayName: hostDisplayName,
+    isHome: false,
   };
 
   const partyData: Party = {
