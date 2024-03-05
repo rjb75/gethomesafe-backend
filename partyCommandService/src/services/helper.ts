@@ -1,14 +1,12 @@
-import { User } from "../models/party.model";
-
-export const getUserInfo = async (userId: string): Promise<User> => {
+export const getIsUserHome = async (userId: string): Promise<boolean> => {
   const apiGatewayUrl = process.env.API_GATEWAY_URL;
   if (!apiGatewayUrl) {
-    throw new Error("getUserInfo - USER_SERVICE_URL not set");
+    throw new Error("getUserInfo - API_GATEWAY_URL not set");
   }
 
-  let userInfo: User | undefined;
+  let userInfo: { isUserHome: boolean };
   try {
-    const response = await fetch(`${apiGatewayUrl}/api/getUserInfo`, {
+    const response = await fetch(`${apiGatewayUrl}/api/isUserHome`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -28,5 +26,5 @@ export const getUserInfo = async (userId: string): Promise<User> => {
     throw new Error("Failed to get user info");
   }
 
-  return userInfo;
+  return userInfo.isUserHome;
 };
