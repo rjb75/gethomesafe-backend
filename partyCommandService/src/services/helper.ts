@@ -9,11 +9,15 @@ export const getIsUserHome = async (userId: string): Promise<boolean> => {
     const response = await fetch(`${apiGatewayUrl}/api/isUserHome`, {
       method: "GET",
       headers: {
+        "Content-Type": "application/json",
         "X-User-Id": userId,
       },
     });
-
     userInfo = await response.json();
+
+    if (!userInfo) {
+      throw new Error("User not found");
+    }
   } catch (e) {
     throw new Error("getUserInfo - Error on fetching user info");
   }

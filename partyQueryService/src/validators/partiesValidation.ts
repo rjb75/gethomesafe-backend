@@ -1,3 +1,3 @@
-import { checkSchema } from "express-validator";
+import {checkSchema} from "express-validator";
 
-export const partiesValidationSchema = checkSchema({});
+export const partiesValidationSchema = checkSchema({})
