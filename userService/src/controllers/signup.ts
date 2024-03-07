@@ -34,7 +34,7 @@ export const signup = (req: Request, res: Response) => {
           res.status(200).send("User Created");
         })
         .catch((e) => {
-          res.status(500).send(e.message);
+            r.user.delete().finally(() => res.status(500).send(e.message));
         });
     })
     .catch((e) => {

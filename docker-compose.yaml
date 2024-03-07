@@ -22,9 +22,9 @@ services:
     env_file:
       - .env
     depends_on:
-      - mongodb
+      - user_mongodb0
     environment:
-      - MONGO_CONNECTION_STRING=${MONGO_URL}
+      - MONGO_CONNECTION_STRING=${USER_MONGO_URL}
     expose:
       - 3000
   party-query-service:
@@ -37,9 +37,9 @@ services:
     env_file:
       - .env
     depends_on:
-      - mongodb # We should maybe think about creating a different DB instance for the party query/command services. This way we clearly have multiple dbs.
+      - party_mongodb0 # We should maybe think about creating a different DB instance for the party query/command services. This way we clearly have multiple dbs.
     environment:
-      - MONGO_CONNECTION_STRING=${MONGO_URL}
+      - MONGO_CONNECTION_STRING=${PARTY_MONGO_URL}
     expose:
       - 4000
   test-service:
@@ -51,12 +51,133 @@ services:
       - .env
     expose:
       - 1234
-  mongodb:
-    image: mongodb/mongodb-community-server:6.0-ubi8
+  user_mongodb0:
+    image: mongo
+    container_name: user_mongodb0
+    command: mongod --replSet userServiceRelicationSet
+    expose:
+      - 27017
+    ports:
+      - 27017:27017
+    volumes:
+      - user_mongodb0_userData:/data/db
+      - user_mongodb0_config:/data/configdb
+    restart: always
+  user_mongodb1:
+    image: mongo
+    container_name: user_mongodb1
+    command: mongod --replSet userServiceRelicationSet
     expose:
       - 27017
     volumes:
-      - userData:/data/db
+      - user_mongodb1_userData:/data/db
+      - user_mongodb1_config:/data/configdb
+    ports:
+      - 27018:27017
+    restart: always
+  user_mongodb2:
+    image: mongo
+    container_name: user_mongodb2
+    command: mongod --replSet userServiceRelicationSet
+    expose:
+      - 27017
+    volumes:
+      - user_mongodb2_userData:/data/db
+      - user_mongodb2_config:/data/configdb
+    ports:
+      - 27019:27017
+    restart: always
+  user_mongodb_init:
+    image: mongo
+    restart: "no"
+    depends_on:
+      - user_mongodb0
+      - user_mongodb1
+      - user_mongodb2
+    command: >
+      mongosh --host user_mongodb0:27017 --eval  ' db = (new Mongo("user_mongodb0:27017")).getDB("userService"); config = { "_id" : "userServiceRelicationSet", "members" : [
+        {
+          "_id" : 0,
+          "host" : "user_mongodb0:27017"
+        },
+        {
+          "_id" : 1,
+          "host" : "user_mongodb1:27017"
+        },
+        {
+          "_id" : 2,
+          "host" : "user_mongodb2:27017"
+        }
+      ] }; rs.initiate(config); '
+  party_mongodb0:
+    image: mongo
+    container_name: party_mongodb0
+    command: mongod --replSet partyServiceRelicationSet
+    expose:
+      - 27017
+    ports:
+      - 28017:27017
+    volumes:
+      - party_mongodb0_partyData:/data/db
+      - party_mongodb0_config:/data/configdb
+    restart: always
+  party_mongodb1:
+    image: mongo
+    container_name: party_mongodb1
+    command: mongod --replSet partyServiceRelicationSet
+    expose:
+      - 27017
+    volumes:
+      - party_mongodb1_partyData:/data/db
+      - party_mongodb1_config:/data/configdb
+    ports:
+      - 28018:27017
+    restart: always
+  party_mongodb2:
+    image: mongo
+    container_name: party_mongodb2
+    command: mongod --replSet partyServiceRelicationSet
+    expose:
+      - 27017
+    volumes:
+      - party_mongodb2_partyData:/data/db
+      - party_mongodb2_config:/data/configdb
+    ports:
+      - 28019:27017
+    restart: always
+  party_mongodb_init:
+    image: mongo
+    restart: "no"
+    depends_on:
+      - party_mongodb0
+      - party_mongodb1
+      - party_mongodb2
+    command: >
+      mongosh --host party_mongodb0:27017 --eval  ' db = (new Mongo("party_mongodb0:27017")).getDB("partyService"); config = { "_id" : "partyServiceRelicationSet", "members" : [
+        {
+          "_id" : 0,
+          "host" : "party_mongodb0:27017"
+        },
+        {
+          "_id" : 1,
+          "host" : "party_mongodb1:27017"
+        },
+        {
+          "_id" : 2,
+          "host" : "party_mongodb2:27017"
+        }
+      ] }; db.getMongo().setReadPref('secondaryPreferred'); rs.initiate(config);'   
 
 volumes:
-  userData:
+  user_mongodb0_userData:
+  user_mongodb1_userData:
+  user_mongodb2_userData:
+  user_mongodb0_config:
+  user_mongodb1_config:
+  user_mongodb2_config:
+  party_mongodb0_partyData:
+  party_mongodb1_partyData:
+  party_mongodb2_partyData:
+  party_mongodb0_config:
+  party_mongodb1_config:
+  party_mongodb2_config:

@@ -10,16 +10,72 @@ services:
     volumes:
       - ./:/src
     depends_on:
-      - mongodb
+      - mongodb0
     environment:
-      - MONGO_CONNECTION_STRING=${MONGO_URL}
-  mongodb:
-    image: mongodb/mongodb-community-server:6.0-ubi8
+      - MONGO_CONNECTION_STRING=${USER_MONGO_URL}
+  user_mongodb0:
+    image: mongo
+    container_name: user_mongodb0
+    command: mongod --replSet userServiceRelicationSet
+    expose:
+      - 27017
     ports:
       - 27017:27017
     volumes:
-      - userData:/data/db
-
+      - user_mongodb0_userData:/data/db
+      - user_mongodb0_config:/data/configdb
+    restart: always
+  user_mongodb1:
+    image: mongo
+    container_name: user_mongodb1
+    command: mongod --replSet userServiceRelicationSet
+    expose:
+      - 27017
+    volumes:
+      - user_mongodb1_userData:/data/db
+      - user_mongodb1_config:/data/configdb
+    ports:
+      - 27018:27017
+    restart: always
+  user_mongodb2:
+    image: mongo
+    container_name: user_mongodb2
+    command: mongod --replSet userServiceRelicationSet
+    expose:
+      - 27017
+    volumes:
+      - user_mongodb2_userData:/data/db
+      - user_mongodb2_config:/data/configdb
+    ports:
+      - 27019:27017
+    restart: always
+  user_mongodb_init:
+    image: mongo
+    restart: no
+    depends_on:
+      - user_mongodb0
+      - user_mongodb1
+      - user_mongodb2
+    command: >
+      mongosh --host user_mongodb0:27017 --eval  ' db = (new Mongo("user_mongodb0:27017")).getDB("userService"); config = { "_id" : "userServiceRelicationSet", "members" : [
+        {
+          "_id" : 0,
+          "host" : "user_mongodb0:27017"
+        },
+        {
+          "_id" : 1,
+          "host" : "user_mongodb1:27017"
+        },
+        {
+          "_id" : 2,
+          "host" : "user_mongodb2:27017"
+        }
+      ] }; rs.initiate(config); '   
 
 volumes:
-  userData:
+  mongo0_userData:
+  mongo1_userData:
+  mongo2_userData:
+  mongo0_config:
+  mongo1_config:
+  mongo2_config:
