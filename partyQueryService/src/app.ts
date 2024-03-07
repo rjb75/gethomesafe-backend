@@ -1,4 +1,4 @@
-import express, { json } from 'express'
+import express, { json, Request, Response } from 'express'
 import 'dotenv/config'
 import {partyInvite} from "./controllers/partyInvite";
 import {parties} from "./controllers/parties";
@@ -15,6 +15,7 @@ app.use(json())
 app.get('/api/partyInvite', partyInviteValidationSchema, partyInvite);
 app.get('/api/parties', partiesValidationSchema, parties);
 app.get('/api/partyStatus', partyStatusValidationSchema, partyStatus);
+app.get("/api/heartbeat", (req: Request, res: Response) => res.status(200).send());
 
 app.listen(port, () => {
     console.log(`Party query service listening on port ${port}`);

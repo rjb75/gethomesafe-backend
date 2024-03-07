@@ -18,6 +18,7 @@ app.post('/api/signup', signupValidationSchema, signup);
 app.put('/api/updateAccount', updateAccountValidationSchema, updateAccount);
 app.get('/api/isUserHome', isUserHomeValidatorSchema, isUserHome);
 app.get('/api/getUserInfo', getUserInfoValidationSchema, getUserInfo);
+app.get("/api/heartbeat", (req: Request, res: Response) => res.status(200).send());
 
 app.listen(port, () => {
     console.log(`User service listening on port ${port}`);
