@@ -62,6 +62,8 @@ services:
     volumes:
       - user_mongodb0_userData:/data/db
       - user_mongodb0_config:/data/configdb
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
     restart: always
   user_mongodb1:
     image: mongo
@@ -74,6 +76,8 @@ services:
       - user_mongodb1_config:/data/configdb
     ports:
       - 27018:27017
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
     restart: always
   user_mongodb2:
     image: mongo
@@ -86,14 +90,19 @@ services:
       - user_mongodb2_config:/data/configdb
     ports:
       - 27019:27017
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
     restart: always
   user_mongodb_init:
     image: mongo
     restart: "no"
     depends_on:
-      - user_mongodb0
-      - user_mongodb1
-      - user_mongodb2
+      user_mongodb0:
+        condition: service_healthy
+      user_mongodb1:
+        condition: service_healthy
+      user_mongodb2:
+        condition: service_healthy
     command: >
       mongosh --host user_mongodb0:27017 --eval  ' db = (new Mongo("user_mongodb0:27017")).getDB("userService"); config = { "_id" : "userServiceRelicationSet", "members" : [
         {
@@ -120,6 +129,8 @@ services:
     volumes:
       - party_mongodb0_partyData:/data/db
       - party_mongodb0_config:/data/configdb
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
     restart: always
   party_mongodb1:
     image: mongo
@@ -132,6 +143,8 @@ services:
       - party_mongodb1_config:/data/configdb
     ports:
       - 28018:27017
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
     restart: always
   party_mongodb2:
     image: mongo
@@ -144,14 +157,19 @@ services:
       - party_mongodb2_config:/data/configdb
     ports:
       - 28019:27017
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
     restart: always
   party_mongodb_init:
     image: mongo
     restart: "no"
     depends_on:
-      - party_mongodb0
-      - party_mongodb1
-      - party_mongodb2
+      party_mongodb0:
+        condition: service_healthy
+      party_mongodb1:
+        condition: service_healthy
+      party_mongodb2:
+        condition: service_healthy
     command: >
       mongosh --host party_mongodb0:27017 --eval  ' db = (new Mongo("party_mongodb0:27017")).getDB("partyService"); config = { "_id" : "partyServiceRelicationSet", "members" : [
         {
@@ -166,7 +184,7 @@ services:
           "_id" : 2,
           "host" : "party_mongodb2:27017"
         }
-      ] }; db.getMongo().setReadPref('secondaryPreferred'); rs.initiate(config);'   
+      ] }; rs.initiate(config);'
 
 volumes:
   user_mongodb0_userData:
