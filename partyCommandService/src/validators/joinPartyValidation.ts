@@ -1,5 +1,4 @@
 import { checkSchema } from "express-validator";
-import { inviteCodeSanitizer } from "../lib/sanitizer";
 
 export const joinPartyValidationSchema = checkSchema({
   userId: {
@@ -15,9 +14,6 @@ export const joinPartyValidationSchema = checkSchema({
     isString: true,
     isLength: {
       options: { min: 6, max: 6 },
-    },
-    customSanitizer: {
-      options: inviteCodeSanitizer,
     },
     errorMessage: "Invite code must be a string with length of 6",
   },

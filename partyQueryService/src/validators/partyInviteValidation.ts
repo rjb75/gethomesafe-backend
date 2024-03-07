@@ -3,7 +3,6 @@ import { checkSchema } from "express-validator";
 export const partyInviteValidationSchema = checkSchema({
   partyId: {
     in: ["query"],
-    isString: true,
     isLength: {
       options: { min: 1, max: 255 },
     },

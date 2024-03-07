@@ -4,8 +4,8 @@ export const dbClient = (() => {
   let client: Db;
 
   const createClient = () => {
-    const url = process.env.MONGO_URL;
-    const dbName = process.env.DB_NAME;
+    const url = process.env.PARTY_MONGO_URL;
+    const dbName = process.env.PARTY_DB_NAME;
 
     if (!url) {
       console.log("Cant get mongo connection string");

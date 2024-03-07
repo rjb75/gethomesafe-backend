@@ -1,15 +1,11 @@
 import { checkSchema } from "express-validator";
-import { nameSanitizer } from "../lib/sanitizer";
 
 export const createPartyValidationSchema = checkSchema({
-  name: {
+  partyName: {
     in: ["body"],
     isString: true,
     isLength: {
       options: { min: 1, max: 255 },
-    },
-    customSanitizer: {
-      options: nameSanitizer,
     },
     errorMessage: "Name must be a string with length between 1 and 255",
   },
@@ -31,9 +27,6 @@ export const createPartyValidationSchema = checkSchema({
     isString: true,
     isLength: {
       options: { min: 1, max: 255 },
-    },
-    customSanitizer: {
-      options: nameSanitizer,
     },
     errorMessage:
       "Host display name must be a string with length between 1 and 255",

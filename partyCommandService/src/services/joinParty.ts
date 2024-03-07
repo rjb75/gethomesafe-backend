@@ -20,14 +20,13 @@ export const addMemberToParty = async ({
 
   try {
     const updatedParty = await collection.findOneAndUpdate(
-      { inviteCode },
+      { inviteCode: inviteCode },
       { $push: { members: userInfo } }
     );
 
     if (!updatedParty) {
       throw new Error("addMemberToParty - Invalid invite code");
     }
-
     return {
       ...updatedParty,
     };

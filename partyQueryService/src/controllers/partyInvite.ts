@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { validationResult } from "express-validator";
-import { getPartyInviteCode } from "../services/queries";
+import { getPartyByInviteCode } from "../services/queries";
 
 export interface partyInviteRequestQuery {
   partyId: string;
@@ -14,10 +14,9 @@ export const partyInvite = async (
   if (!valResult.isEmpty()) {
     return res.status(300).send(valResult.array());
   }
-
   const partyId = req.query.partyId;
   try {
-    const partyData = await getPartyInviteCode(partyId);
+    const partyData = await getPartyByInviteCode(partyId);
     if (!partyData) {
       return res.status(404).send("Invalid invite code - Party not found");
     }

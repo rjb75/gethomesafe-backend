@@ -23,7 +23,6 @@ export const getPartyStatus = async (
   const database = dbClient.getClient();
 
   const collection = database.collection<Party>(PARTY_COLLECTION);
-
   try {
     const result = await collection.findOne({ _id: new ObjectId(partyId) });
 
@@ -34,7 +33,7 @@ export const getPartyStatus = async (
   }
 };
 
-export const getPartyInviteCode = async (
+export const getPartyByInviteCode = async (
   partyId: string
 ): Promise<string | null> => {
   const database = dbClient.getClient();

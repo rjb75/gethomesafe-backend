@@ -11,7 +11,7 @@ const port = 5000;
 app.use(json());
 
 app.post("/api/create-party", createPartyValidationSchema, createParty);
-app.get("/api/join-party", joinPartyValidationSchema, joinParty);
+app.post("/api/join-party", joinPartyValidationSchema, joinParty);
 app.get("/api/heartbeat", (req: Request, res: Response) =>
   res.status(200).send()
 );

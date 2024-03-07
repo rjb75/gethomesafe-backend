@@ -6,7 +6,7 @@ import { Party, User } from "../models/party.model";
 type CreatePartyArgs = CreatePartyRequestBody;
 
 export const createNewParty = async ({
-  name,
+  partyName,
   endTime,
   hostUserId,
   hostDisplayName,
@@ -23,7 +23,7 @@ export const createNewParty = async ({
 
   const partyData: Party = {
     _id: new ObjectId(),
-    name,
+    name: partyName,
     hostUserId,
     inviteCode: generateInviteCode(),
     qrCode: "",
