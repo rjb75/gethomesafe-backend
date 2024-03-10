@@ -37,14 +37,10 @@ func (s *Server) HeartbeatCheck(url string) bool {
 func (s *Server) StartHeartbeat(url string) {
 	for {
 		if s.HeartbeatCheck(url) {
-			s.Mutex.Lock()
-			s.IsRunning = true
-			s.Mutex.Unlock()
+			s.SetStatus(true)
 		} else {
 			fmt.Println("Server is down", s.Host, s.Port)
-			s.Mutex.Lock()
-			s.IsRunning = false
-			s.Mutex.Unlock()
+			s.SetStatus(false)
 		}
 		time.Sleep(time.Duration(time.Duration(rand.Intn(maxHeartbeatTimeout-minHeartbeatTimeout)+minHeartbeatTimeout) * time.Second))
 	}

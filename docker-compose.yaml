@@ -10,11 +10,42 @@ services:
     ports:
       - 8080:8080
     depends_on:
-      - user-service
+      - user-service-0
+      - user-service-1
       - test-service
       - test-service-2
-  user-service:
-    hostname: user-service
+  user-service-0:
+    hostname: user-service-0
+    build:
+      context: ./userService
+      dockerfile: Dockerfile
+    volumes:
+      - .userService/:/src
+    env_file:
+      - .env
+    depends_on:
+      - user_mongodb0
+    environment:
+      - MONGO_CONNECTION_STRING=${USER_MONGO_URL}
+    expose:
+      - 3000
+  user-service-1:
+    hostname: user-service-1
+    build:
+      context: ./userService
+      dockerfile: Dockerfile
+    volumes:
+      - .userService/:/src
+    env_file:
+      - .env
+    depends_on:
+      - user_mongodb0
+    environment:
+      - MONGO_CONNECTION_STRING=${USER_MONGO_URL}
+    expose:
+      - 3000
+  user-service-2:
+    hostname: user-service-2
     build:
       context: ./userService
       dockerfile: Dockerfile
