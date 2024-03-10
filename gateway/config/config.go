@@ -1,8 +1,10 @@
 package config
 
+import "sync"
+
 type Config struct {
-	Services map[string]Service `json:"services"`
-	Port     int                `json:"port"`
+	Services []Service `json:"services"`
+	Port     int       `json:"port"`
 }
 
 type Route struct {
@@ -13,9 +15,19 @@ type Route struct {
 }
 
 type Service struct {
-	Name     string   `json:"name"`
-	Host     []string `json:"hosts"`
-	Routes   []Route  `json:"routes"`
-	Port     int      `json:"port"`
-	Protocol string   `json:"protocol"`
+	Name      string     `json:"name"`
+	Host      []Server   `json:"hosts"`
+	Routes    []Route    `json:"routes"`
+	Protocol  string     `json:"protocol"`
+	LastId    int        `json:"-"`
+	Heartbeat string     `json:"heartbeat"`
+	Mutex     sync.Mutex `json:"-"`
+}
+
+type Server struct {
+	Port      int        `json:"port"`
+	Host      string     `json:"host"`
+	Mutex     sync.Mutex `json:"-"`
+	IsRunning bool       `json:"-"`
+	Id        int        `json:"-"`
 }

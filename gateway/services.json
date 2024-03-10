@@ -1,11 +1,16 @@
 {
   "port": 8080,
-  "services": {
-    "testService": {
+  "services": [
+    {
       "name": "testService",
-      "hosts": ["localhost"],
-      "port": 1234,
+      "hosts": [
+        {
+          "host": "localhost",
+          "port": 1234
+        }
+      ],
       "protocol": "http",
+      "heartbeat": "/api/heartbeat",
       "routes": [
         {
           "path": "/test",
@@ -21,11 +26,24 @@
         }
       ]
     },
-    "userService": {
+    {
       "name": "userService",
-      "hosts": ["localhost"],
-      "port": 3000,
+      "hosts": [
+        {
+          "host": "localhost",
+          "port": 3000
+        },
+        {
+          "host": "localhost",
+          "port": 3001
+        },
+        {
+          "host": "localhost",
+          "port": 3002
+        }
+      ],
       "protocol": "http",
+      "heartbeat": "/api/heartbeat",
       "routes": [
         {
           "path": "/api/signup",
@@ -53,11 +71,16 @@
         }
       ]
     },
-    "partyQueryService": {
+    {
       "name": "partyQueryService",
-      "hosts": ["localhost"],
-      "port": 3000,
+      "hosts": [
+        {
+          "host": "localhost",
+          "port": 4000
+        }
+      ],
       "protocol": "http",
+      "heartbeat": "/api/heartbeat",
       "routes": [
         {
           "path": "/api/partyInvite",
@@ -79,5 +102,5 @@
         }
       ]
     }
-  }
+  ]
 }

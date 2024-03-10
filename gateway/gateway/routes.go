@@ -2,6 +2,7 @@ package gateway
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/rjb75/gethomesafe-backend/gateway/config"
 )
@@ -15,7 +16,15 @@ func (g *Gateway) RegisterRoutes() error {
 		return fmt.Errorf("config is nil")
 	}
 
-	for _, service := range g.config.Services {
+	for j := range g.config.Services {
+		service := &g.config.Services[j]
+		for i := range service.Host {
+			service.Host[i].Mutex = sync.Mutex{}
+			service.Host[i].IsRunning = false
+			service.Host[i].Id = i
+			go service.Host[i].StartHeartbeat(service.Heartbeat)
+		}
+
 		for _, route := range service.Routes {
 			if route.Authenticated {
 				switch route.Method {

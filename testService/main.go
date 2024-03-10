@@ -15,5 +15,9 @@ func main() {
 		})
 	})
 
+	router.GET("/api/heartbeat", func(c *gin.Context) {
+		c.Status(http.StatusOK)
+	})
+
 	router.Run(":1234")
 }

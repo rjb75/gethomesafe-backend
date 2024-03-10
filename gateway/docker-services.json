@@ -1,11 +1,20 @@
 {
   "port": 8080,
-  "services": {
-    "testService": {
+  "services": [
+    {
       "name": "testService",
-      "hosts": ["test-service"],
-      "port": 1234,
+      "hosts": [
+        {
+          "host": "test-service",
+          "port": 1234
+        },
+        {
+          "host": "test-service-2",
+          "port": 1234
+        }
+      ],
       "protocol": "http",
+      "heartbeat": "/api/heartbeat",
       "routes": [
         {
           "path": "/test",
@@ -21,11 +30,24 @@
         }
       ]
     },
-    "userService": {
+    {
       "name": "userService",
-      "hosts": ["user-service"],
-      "port": 3000,
+      "hosts": [
+        {
+          "host": "user-service-0",
+          "port": 3000
+        },
+        {
+          "host": "user-service-1",
+          "port": 3000
+        },
+        {
+          "host": "user-service-2",
+          "port": 3000
+        }
+      ],
       "protocol": "http",
+      "heartbeat": "/api/heartbeat",
       "routes": [
         {
           "path": "/api/signup",
@@ -44,8 +66,45 @@
           "gatewayPath": "/api/isUserHome",
           "method": "GET",
           "authenticated": true
+        },
+        {
+          "path": "/api/getUserInfo",
+          "gatewayPath": "/api/getUserInfo",
+          "method": "GET",
+          "authenticated": true
+        }
+      ]
+    },
+    {
+      "name": "partyQueryService",
+      "hosts": [
+        {
+          "host": "party-query-service",
+          "port": 4000
+        }
+      ],
+      "protocol": "http",
+      "heartbeat": "/api/heartbeat",
+      "routes": [
+        {
+          "path": "/api/partyInvite",
+          "gatewayPath": "/api/partyInvite",
+          "method": "GET",
+          "authenticated": true
+        },
+        {
+          "path": "/api/parties",
+          "gatewayPath": "/api/parties",
+          "method": "GET",
+          "authenticated": true
+        },
+        {
+          "path": "/api/partyStatus",
+          "gatewayPath": "/api/partyStatus",
+          "method": "GET",
+          "authenticated": true
         }
       ]
     }
-  }
+  ]
 }
