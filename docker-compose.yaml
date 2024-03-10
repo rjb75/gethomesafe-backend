@@ -51,6 +51,15 @@ services:
       - .env
     expose:
       - 1234
+  test-service-2:
+    hostname: test-service
+    build:
+      context: ./testService
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    expose:
+      - 1234
   user_mongodb0:
     image: mongo
     container_name: user_mongodb0
