@@ -10,7 +10,7 @@ import (
 	"github.com/rjb75/gethomesafe-backend/gateway/config"
 )
 
-func BackupProxy(r config.Route, s config.Service, c *gin.Context) {
+func BackupProxy(r config.Route, s *config.Service, c *gin.Context) {
 	fmt.Println("Backup proxy")
 	formatRequest(c, &r)
 
@@ -79,7 +79,7 @@ func formatRequest(c *gin.Context, r *config.Route) {
 	}
 }
 
-func (g *Gateway) Proxy(r config.Route, s config.Service) gin.HandlerFunc {
+func (g *Gateway) Proxy(r config.Route, s *config.Service) gin.HandlerFunc {
 	fmt.Println(r, s.Host)
 	return func(c *gin.Context) {
 		host, err := s.GetNextServer()

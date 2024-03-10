@@ -30,7 +30,7 @@ func (s *Server) HeartbeatCheck(url string) bool {
 		return false
 	}
 
-	fmt.Println("Server is up and running")
+	fmt.Println("Server is up and running", query.URL.String())
 	return true
 }
 

@@ -16,7 +16,8 @@ func (g *Gateway) RegisterRoutes() error {
 		return fmt.Errorf("config is nil")
 	}
 
-	for _, service := range g.config.Services {
+	for j := range g.config.Services {
+		service := &g.config.Services[j]
 		for i := range service.Host {
 			service.Host[i].Mutex = sync.Mutex{}
 			service.Host[i].IsRunning = false

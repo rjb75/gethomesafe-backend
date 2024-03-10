@@ -3,8 +3,8 @@ package config
 import "sync"
 
 type Config struct {
-	Services map[string]Service `json:"services"`
-	Port     int                `json:"port"`
+	Services []Service `json:"services"`
+	Port     int       `json:"port"`
 }
 
 type Route struct {
@@ -15,12 +15,13 @@ type Route struct {
 }
 
 type Service struct {
-	Name      string   `json:"name"`
-	Host      []Server `json:"hosts"`
-	Routes    []Route  `json:"routes"`
-	Protocol  string   `json:"protocol"`
-	LastId    int      `json:"-"`
-	Heartbeat string   `json:"heartbeat"`
+	Name      string     `json:"name"`
+	Host      []Server   `json:"hosts"`
+	Routes    []Route    `json:"routes"`
+	Protocol  string     `json:"protocol"`
+	LastId    int        `json:"-"`
+	Heartbeat string     `json:"heartbeat"`
+	Mutex     sync.Mutex `json:"-"`
 }
 
 type Server struct {

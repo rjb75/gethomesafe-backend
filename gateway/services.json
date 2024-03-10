@@ -1,7 +1,7 @@
 {
   "port": 8080,
-  "services": {
-    "testService": {
+  "services": [
+    {
       "name": "testService",
       "hosts": [
         {
@@ -26,7 +26,7 @@
         }
       ]
     },
-    "userService": {
+    {
       "name": "userService",
       "hosts": [
         {
@@ -63,7 +63,7 @@
         }
       ]
     },
-    "partyQueryService": {
+    {
       "name": "partyQueryService",
       "hosts": [
         {
@@ -94,5 +94,5 @@
         }
       ]
     }
-  }
+  ]
 }
