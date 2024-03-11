@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { validationResult } from "express-validator";
-import { getParties } from "../services/queries";
+import { getUserParties } from "../services/queries";
 
 export const parties = async (req: Request, res: Response) => {
   const valResult = validationResult(req);
@@ -8,8 +8,14 @@ export const parties = async (req: Request, res: Response) => {
     return res.status(300).send(valResult.array());
   }
 
+  const userId = req.get("X-User-Id");
+  if (!userId) {
+    res.status(500).send("No user id provided");
+    return;
+  }
+
   try {
-    const partyData = await getParties();
+    const partyData = await getUserParties(userId);
 
     res.status(200).json(partyData);
   } catch (e) {

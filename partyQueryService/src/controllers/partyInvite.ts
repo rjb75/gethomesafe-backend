@@ -3,7 +3,7 @@ import { validationResult } from "express-validator";
 import { getPartyByInviteCode } from "../services/queries";
 
 export interface partyInviteRequestQuery {
-  partyId: string;
+  inviteCode: string;
 }
 
 export const partyInvite = async (
@@ -14,9 +14,9 @@ export const partyInvite = async (
   if (!valResult.isEmpty()) {
     return res.status(300).send(valResult.array());
   }
-  const partyId = req.query.partyId;
+  const inviteCode = req.query.inviteCode;
   try {
-    const partyData = await getPartyByInviteCode(partyId);
+    const partyData = await getPartyByInviteCode(inviteCode);
     if (!partyData) {
       return res.status(404).send("Invalid invite code - Party not found");
     }

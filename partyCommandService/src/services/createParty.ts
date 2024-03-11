@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 import { CreatePartyRequestBody } from "../controllers/createParty";
 import { dbClient, PARTY_COLLECTION } from "../models/mongo";
 import { Party, User } from "../models/party.model";
+import { v4 as uuidv4 } from "uuid";
 
 type CreatePartyArgs = CreatePartyRequestBody;
 
@@ -25,7 +26,7 @@ export const createNewParty = async ({
     _id: new ObjectId(),
     name: partyName,
     hostUserId,
-    inviteCode: generateInviteCode(),
+    inviteCode: uuidv4(),
     qrCode: "",
     active: true,
     members: [hostMemberInfo],
@@ -46,8 +47,4 @@ export const createNewParty = async ({
   }
 
   return partyData;
-};
-
-const generateInviteCode = () => {
-  return Math.floor(100000 + Math.random() * 900000).toString();
 };
