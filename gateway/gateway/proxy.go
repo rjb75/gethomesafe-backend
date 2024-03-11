@@ -101,9 +101,7 @@ func (g *Gateway) Proxy(r config.Route, s *config.Service) gin.HandlerFunc {
 		query.Header = c.Request.Header
 		params := c.Request.URL.Query()
 		for k, v := range c.Request.URL.Query() {
-			for _, value := range v {
-				params.Add(k, value)
-			}
+			params.Set(k, v[len(v)-1])
 		}
 		query.URL.RawQuery = params.Encode()
 

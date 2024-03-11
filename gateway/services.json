@@ -101,6 +101,31 @@
           "authenticated": true
         }
       ]
+    },
+    {
+      "name": "partyCommandService",
+      "hosts": [
+        {
+          "host": "localhost",
+          "port": 5000
+        }
+      ],
+      "protocol": "http",
+      "heartbeat": "/api/heartbeat",
+      "routes": [
+        {
+          "path": "/api/create-party",
+          "gatewayPath": "/api/create-party",
+          "method": "POST",
+          "authenticated": true
+        },
+        {
+          "path": "/api/join-party",
+          "gatewayPath": "/api/join-party",
+          "method": "POST",
+          "authenticated": true
+        }
+      ]
     }
   ]
 }

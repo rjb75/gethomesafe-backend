@@ -74,6 +74,21 @@ services:
       - MONGO_CONNECTION_STRING=${PARTY_MONGO_URL}
     expose:
       - 4000
+  party-command-service:
+    hostname: party-command-service
+    build:
+      context: ./partyCommandService
+      dockerfile: Dockerfile
+    volumes:
+      - .partyCommandService/:/src
+    env_file:
+      - .env
+    depends_on:
+      - party_mongodb0 # We should maybe think about creating a different DB instance for the party query/command services. This way we clearly have multiple dbs.
+    environment:
+      - MONGO_CONNECTION_STRING=${PARTY_MONGO_URL}
+    expose:
+      - 5000
   test-service:
     hostname: test-service
     build:
