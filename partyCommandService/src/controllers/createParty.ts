@@ -5,7 +5,6 @@ import { createNewParty } from "../services/createParty";
 export interface CreatePartyRequestBody {
   partyName: string;
   endTime?: string;
-  hostUserId: string;
   hostDisplayName: string;
 }
 
@@ -13,11 +12,18 @@ export const createParty = async (
   req: Request<{}, {}, CreatePartyRequestBody, {}>,
   res: Response
 ) => {
-  const { partyName, endTime, hostUserId, hostDisplayName } = req.body;
+  const { partyName, endTime, hostDisplayName } = req.body;
   const valResult = validationResult(req);
   if (!valResult.isEmpty()) {
     return res.status(300).send(valResult.array());
   }
+
+  const hostUserId = req.get("X-User-Id");
+  if (!hostUserId) {
+    res.status(500).send("No user id provided");
+    return;
+  }
+
   try {
     const partyData = await createNewParty({
       partyName,

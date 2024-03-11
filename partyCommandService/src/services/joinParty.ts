@@ -1,7 +1,8 @@
 import { JoinPartyRequestBody } from "../controllers/joinParty";
 import { PARTY_COLLECTION, dbClient } from "../models/mongo";
 import { Party, User } from "../models/party.model";
-type JoinPartyArgs = JoinPartyRequestBody;
+
+type JoinPartyArgs = { userId: string } & JoinPartyRequestBody;
 
 export const addMemberToParty = async ({
   inviteCode,

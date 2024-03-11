@@ -4,7 +4,6 @@ import { addMemberToParty } from "../services/joinParty";
 
 export interface JoinPartyRequestBody {
   inviteCode: string;
-  userId: string;
   userDisplayName: string;
 }
 
@@ -12,11 +11,17 @@ export const joinParty = async (
   req: Request<{}, {}, JoinPartyRequestBody, {}>,
   res: Response
 ) => {
-  const { inviteCode, userId, userDisplayName } = req.body;
+  const { inviteCode, userDisplayName } = req.body;
 
   const valResult = validationResult(req);
   if (!valResult.isEmpty()) {
     return res.status(300).send(valResult.array());
+  }
+
+  const userId = req.get("X-User-Id");
+  if (!userId) {
+    res.status(500).send("No user id provided");
+    return;
   }
 
   try {

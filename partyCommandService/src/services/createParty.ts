@@ -4,7 +4,7 @@ import { dbClient, PARTY_COLLECTION } from "../models/mongo";
 import { Party, User } from "../models/party.model";
 import { v4 as uuidv4 } from "uuid";
 
-type CreatePartyArgs = CreatePartyRequestBody;
+type CreatePartyArgs = { hostUserId: string } & CreatePartyRequestBody;
 
 export const createNewParty = async ({
   partyName,
