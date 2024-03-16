@@ -79,7 +79,15 @@
       "name": "partyQueryService",
       "hosts": [
         {
-          "host": "party-query-service",
+          "host": "party-query-service-0",
+          "port": 4000
+        },
+        {
+          "host": "party-query-service-1",
+          "port": 4000
+        },
+        {
+          "host": "party-query-service-2",
           "port": 4000
         }
       ],
@@ -110,7 +118,15 @@
       "name": "partyCommandService",
       "hosts": [
         {
-          "host": "party-command-service",
+          "host": "party-command-service-0",
+          "port": 5000
+        },
+        {
+          "host": "party-command-service-1",
+          "port": 5000
+        },
+        {
+          "host": "party-command-service-2",
           "port": 5000
         }
       ],

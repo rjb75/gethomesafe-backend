@@ -77,6 +77,14 @@
         {
           "host": "localhost",
           "port": 4000
+        },
+        {
+          "host": "localhost",
+          "port": 4001
+        },
+        {
+          "host": "localhost",
+          "port": 4002
         }
       ],
       "protocol": "http",
@@ -108,6 +116,14 @@
         {
           "host": "localhost",
           "port": 5000
+        },
+        {
+          "host": "localhost",
+          "port": 5001
+        },
+        {
+          "host": "localhost",
+          "port": 5002
         }
       ],
       "protocol": "http",

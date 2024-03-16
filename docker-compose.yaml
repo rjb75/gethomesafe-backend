@@ -10,10 +10,18 @@ services:
     ports:
       - 8080:8080
     depends_on:
-      - user-service-0
-      - user-service-1
       - test-service
       - test-service-2
+      - user-service-0
+      - user-service-1
+      - user-service-2
+      - party-query-service-0
+      - party-query-service-1
+      - party-query-service-2
+      - party-command-service-0
+      - party-command-service-1
+      - party-command-service-2
+
   user-service-0:
     hostname: user-service-0
     build:
@@ -59,8 +67,8 @@ services:
       - MONGO_CONNECTION_STRING=${USER_MONGO_URL}
     expose:
       - 3000
-  party-query-service:
-    hostname: party-query-service
+  party-query-service-0:
+    hostname: party-query-service-0
     build:
       context: ./partyQueryService
       dockerfile: Dockerfile
@@ -74,8 +82,68 @@ services:
       - MONGO_CONNECTION_STRING=${PARTY_MONGO_URL}
     expose:
       - 4000
-  party-command-service:
-    hostname: party-command-service
+  party-query-service-1:
+    hostname: party-query-service-1
+    build:
+      context: ./partyQueryService
+      dockerfile: Dockerfile
+    volumes:
+      - .partyQueryService/:/src
+    env_file:
+      - .env
+    depends_on:
+      - party_mongodb0 # We should maybe think about creating a different DB instance for the party query/command services. This way we clearly have multiple dbs.
+    environment:
+      - MONGO_CONNECTION_STRING=${PARTY_MONGO_URL}
+    expose:
+      - 4000
+  party-query-service-2:
+    hostname: party-query-service-2
+    build:
+      context: ./partyQueryService
+      dockerfile: Dockerfile
+    volumes:
+      - .partyQueryService/:/src
+    env_file:
+      - .env
+    depends_on:
+      - party_mongodb0 # We should maybe think about creating a different DB instance for the party query/command services. This way we clearly have multiple dbs.
+    environment:
+      - MONGO_CONNECTION_STRING=${PARTY_MONGO_URL}
+    expose:
+      - 4000
+  party-command-service-0:
+    hostname: party-command-service-0
+    build:
+      context: ./partyCommandService
+      dockerfile: Dockerfile
+    volumes:
+      - .partyCommandService/:/src
+    env_file:
+      - .env
+    depends_on:
+      - party_mongodb0 # We should maybe think about creating a different DB instance for the party query/command services. This way we clearly have multiple dbs.
+    environment:
+      - MONGO_CONNECTION_STRING=${PARTY_MONGO_URL}
+    expose:
+      - 5000
+  party-command-service-1:
+    hostname: party-command-service-1
+    build:
+      context: ./partyCommandService
+      dockerfile: Dockerfile
+    volumes:
+      - .partyCommandService/:/src
+    env_file:
+      - .env
+    depends_on:
+      - party_mongodb0 # We should maybe think about creating a different DB instance for the party query/command services. This way we clearly have multiple dbs.
+    environment:
+      - MONGO_CONNECTION_STRING=${PARTY_MONGO_URL}
+    expose:
+      - 5000
+  party-command-service-2:
+    hostname: party-command-service-2
     build:
       context: ./partyCommandService
       dockerfile: Dockerfile
