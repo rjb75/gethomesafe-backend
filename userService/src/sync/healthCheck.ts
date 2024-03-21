@@ -1,7 +1,8 @@
 import { get } from "http";
 
 /* Send health check to id */
-export const healthCheck = (hostname: string): boolean => {
+export const healthCheck = (hostname: string) => {
+    console.log("Started Healthcheck")
     const options = {
         timeout: 3000,
         hostname: hostname,
@@ -9,10 +10,5 @@ export const healthCheck = (hostname: string): boolean => {
         path: '/api/heartbeat'
     }
 
-    get(options, res => {
-        return res.statusCode === 200;
-    }).on('timeout', () => {
-        return false;
-    })
-    return false;
+    return get(options)
 }

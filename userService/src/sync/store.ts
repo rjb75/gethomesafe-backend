@@ -2,7 +2,7 @@
 
 class SyncStore {
     private static instance: SyncStore
-    private leaderHostname: string | null
+    private leaderHostname: string | undefined
     private running: boolean
     private hosts: string[]
     private id: number
@@ -10,7 +10,7 @@ class SyncStore {
 
 
     private constructor() {
-        this.leaderHostname = null
+        this.leaderHostname = undefined
         this.running = false
         this.hosts = [];
         this.id = -1;
@@ -53,7 +53,7 @@ class SyncStore {
         return this.leaderHostname;
     }
 
-    setLeaderHostname(hostname: string) {
+    setLeaderHostname(hostname: string | undefined) {
         this.leaderHostname = hostname;
     }
 

@@ -31,9 +31,12 @@ app.put('/api/updateAccount', updateAccountValidationSchema, updateAccount);
 app.get('/api/isUserHome', isUserHomeValidatorSchema, isUserHome);
 app.get('/api/getUserInfo', getUserInfoValidationSchema, getUserInfo);
 
-app.get("/api/heartbeat", (req: Request, res: Response) => res.status(200).send());
+app.get("/api/heartbeat", (req: Request, res: Response) => res.status(200).header('primaryHost', store.getInstance().getLeaderHostname()).send());
 app.get("/api/election", (req: Request, res: Response) => {
+    console.log("received election message");
     const peer_id = req.get("id");
+    console.log(`Peer id: ${peer_id}`);
+    console.log(`My id: ${store.getInstance().getId()}`)
     if (Number(peer_id) < Number(store.getInstance().getId())) {
         res.status(200).send() // Bully
         if (!store.getInstance().getRunning()) {
@@ -42,7 +45,8 @@ app.get("/api/election", (req: Request, res: Response) => {
     }
 });
 app.get("/api/leader", (req: Request, res: Response) => {
-    store.getInstance().setLeaderHostname(req.hostname);
+    console.log(`received leader message: ${req.get('leaderHostname')}`)
+    store.getInstance().setLeaderHostname(req.get('leaderHostname') || undefined);
     store.getInstance().setRunning(false);
     res.status(200).send();
 });
@@ -52,9 +56,16 @@ app.listen(port, () => {
 
 setInterval(() => {
     const leaderHostname = store.getInstance().getLeaderHostname();
-
-    if (!leaderHostname) initiateElection()
-    else if (!healthCheck(leaderHostname)) {
+    if (!leaderHostname) {
+        console.log("No current leader")
         initiateElection()
+    } else {
+        console.log(`Current Leader: ${leaderHostname}`)
+        if (Number(leaderHostname.split('-')[2]) !== store.getInstance().getId()) {
+            healthCheck(leaderHostname).on("error", (err) => {
+                console.log("Healthcheck failed")
+                initiateElection()
+            })
+        }
     }
 }, 5000)
