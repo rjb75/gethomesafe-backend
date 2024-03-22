@@ -17,7 +17,8 @@ export const updateReplicas = (req: Request, newBody?: any) => {
             hostname: hosts[i],
             headers: {
                 "Content-Type": "application/json",
-                "Content-Length": Buffer.byteLength(body)
+                "Content-Length": Buffer.byteLength(body),
+                "X-User-Id": req.get("X-User-Id"),
             }
         }
         const r = http.request(options).on("response", (response) => console.log(response.statusCode)).on("error", () => {})

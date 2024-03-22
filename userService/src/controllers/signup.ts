@@ -37,7 +37,7 @@ export const signup = (req: Request, res: Response) => {
               createUser(newUser)
                   .then((r) => {
                       res.status(200).send("User Created");
-                      updateReplicas(req, newUser);
+                      if (syncStore.isLeader()) updateReplicas(req, newUser);
                   })
                   .catch((e) => {
                       console.log(e)
@@ -50,9 +50,14 @@ export const signup = (req: Request, res: Response) => {
   } else {
       const user: User = req.body;
         console.log(user)
-      createUser(user)
-          .then((r) => {
-              res.status(200).send("User Created");
-          })
+
+      if (syncStore.isDBReady()) {
+          createUser(user)
+              .then((r) => {
+                  res.status(200).send("User Created");
+              })
+      } else {
+          syncStore.pushToSignupQueue(user);
+      }
   }
 };

@@ -11,6 +11,7 @@ import {getUserInfo} from "./controllers/getUserInfo";
 import {healthCheck} from "./sync/healthCheck";
 import {initiateElection} from "./sync/election";
 import store from "./sync/store";
+import {syncDB} from "./sync/syncDB";
 
 const app = express();
 const port = 3000;
@@ -50,9 +51,6 @@ app.get("/api/leader", (req: Request, res: Response) => {
     store.getInstance().setRunning(false);
     res.status(200).send();
 });
-app.listen(port, () => {
-    console.log(`User service listening on port ${port}`);
-});
 
 setInterval(() => {
     const leaderHostname = store.getInstance().getLeaderHostname();
@@ -69,3 +67,8 @@ setInterval(() => {
         }
     }
 }, 5000)
+
+app.listen(port, () => {
+    console.log(`User service listening on port ${port}`);
+    syncDB();
+});

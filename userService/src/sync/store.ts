@@ -1,3 +1,7 @@
+import {read} from "node:fs";
+import {User} from "../models/User";
+import {createUser} from "../services/createUser";
+import {updateUser} from "../services/updateUser";
 
 
 class SyncStore {
@@ -7,14 +11,35 @@ class SyncStore {
     private hosts: string[]
     private id: number
     private hostname: string
-
+    private dbReady: boolean
+    private signupQueue: User[]
+    private updateQueue: User[]
 
     private constructor() {
-        this.leaderHostname = undefined
-        this.running = false
+        this.leaderHostname = undefined;
+        this.running = false;
         this.hosts = [];
         this.id = -1;
-        this.hostname = ""
+        this.hostname = "";
+        this.dbReady = false;
+        this.signupQueue = [];
+        this.updateQueue = [];
+    }
+
+    pushToSignupQueue(user: User) {
+        this.signupQueue.push(user);
+    }
+
+    pushToUpdateQueue(user: User) {
+        this.updateQueue.push(user);
+    }
+
+    isDBReady() {
+        return this.dbReady;
+    }
+
+    setDBReady(ready: boolean) {
+        this.dbReady = ready;
     }
 
     setHostname(hostname: string) {
@@ -60,6 +85,19 @@ class SyncStore {
 
     setLeaderHostname(hostname: string | undefined) {
         this.leaderHostname = hostname;
+    }
+
+    async applyQueueUpdates() {
+        while (this.signupQueue.length > 0 || this.updateQueue.length > 0) {
+            if (this.signupQueue.length !== 0) {
+                // @ts-ignore
+                await createUser(this.signupQueue.shift());
+            } else {
+                const user = this.updateQueue.shift();
+                // @ts-ignore
+                await updateUser(user._id, user?.displayName, user?.address);
+            }
+        }
     }
 
     static getInstance(): SyncStore {

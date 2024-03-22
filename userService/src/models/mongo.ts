@@ -2,12 +2,19 @@ import {Db, MongoClient, ServerApiVersion} from "mongodb";
 
 export const dbClient =  (() => {
     let client: Db;
+    let url: string | undefined;
+    let dbname: string | undefined;
 
     const createClient = () => {
-        const url = process.env.MONGO_CONNECTION_STRING;
-        const dbName = process.env.USER_DB_NAME;
+        url = process.env.MONGO_CONNECTION_STRING;
+        dbname = process.env.USER_DB_NAME;
 
         if (!url) {
+            console.log("Cant get env");
+            process.exit(1);
+        }
+
+        if (!dbname) {
             console.log("Cant get env");
             process.exit(1);
         }
@@ -19,7 +26,7 @@ export const dbClient =  (() => {
                     deprecationErrors: true,
                 }
             }
-        ).db(dbName)
+        ).db(dbname)
     }
 
     return {
