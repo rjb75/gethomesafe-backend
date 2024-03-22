@@ -22,7 +22,11 @@ func (g *Gateway) RegisterRoutes() error {
 			service.Host[i].Mutex = sync.Mutex{}
 			service.Host[i].IsRunning = false
 			service.Host[i].Id = i
-			go service.Host[i].StartHeartbeat(service.Heartbeat)
+			if service.ReplicationMode == "primary-leader" {
+				go service.Host[i].StartLeaderCheck(service)
+			} else {
+				go service.Host[i].StartHeartbeat(service.Heartbeat)
+			}
 		}
 
 		for _, route := range service.Routes {

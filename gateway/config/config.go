@@ -15,13 +15,15 @@ type Route struct {
 }
 
 type Service struct {
-	Name      string     `json:"name"`
-	Host      []Server   `json:"hosts"`
-	Routes    []Route    `json:"routes"`
-	Protocol  string     `json:"protocol"`
-	LastId    int        `json:"-"`
-	Heartbeat string     `json:"heartbeat"`
-	Mutex     sync.Mutex `json:"-"`
+	Name            string     `json:"name"`
+	Host            []Server   `json:"hosts"`
+	Routes          []Route    `json:"routes"`
+	Protocol        string     `json:"protocol"`
+	LastId          int        `json:"-"`
+	Heartbeat       string     `json:"heartbeat"`
+	ReplicationMode string     `json:"replicationMode"`
+	Mutex           sync.Mutex `json:"-"`
+	PrimaryHost     *Server    `json:"-"` // Only used in primary-leader mode
 }
 
 type Server struct {

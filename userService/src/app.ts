@@ -32,7 +32,7 @@ app.put('/api/updateAccount', updateAccountValidationSchema, updateAccount);
 app.get('/api/isUserHome', isUserHomeValidatorSchema, isUserHome);
 app.get('/api/getUserInfo', getUserInfoValidationSchema, getUserInfo);
 
-app.get("/api/heartbeat", (req: Request, res: Response) => res.status(200).header('primaryHost', store.getInstance().getLeaderHostname()).send());
+app.get("/api/heartbeat", (req: Request, res: Response) => res.status(200).header('X-Primary-Host', store.getInstance().getLeaderHostname()).send());
 app.get("/api/election", (req: Request, res: Response) => {
     console.log("received election message");
     const peer_id = req.get("id");

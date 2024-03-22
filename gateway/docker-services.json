@@ -15,6 +15,7 @@
       ],
       "protocol": "http",
       "heartbeat": "/api/heartbeat",
+      "replicationMode": "round-robin",
       "routes": [
         {
           "path": "/test",
@@ -48,6 +49,7 @@
       ],
       "protocol": "http",
       "heartbeat": "/api/heartbeat",
+      "replicationMode": "primary-leader",
       "routes": [
         {
           "path": "/api/signup",
@@ -93,6 +95,7 @@
       ],
       "protocol": "http",
       "heartbeat": "/api/heartbeat",
+      "replicationMode": "round-robin",
       "routes": [
         {
           "path": "/api/partyInvite",

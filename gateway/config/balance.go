@@ -1,6 +1,40 @@
 package config
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
+
+type PrimaryResult struct {
+	PrimaryHost *Server
+	Err         error
+}
+
+func (s *Service) WaitForPrimary() PrimaryResult {
+	for {
+		if s.PrimaryHost != nil {
+			return PrimaryResult{PrimaryHost: s.PrimaryHost, Err: nil}
+		}
+	}
+}
+
+func (s *Service) GetPrimaryServer(*Server) (*Server, error) {
+	if s.PrimaryHost == nil || !s.PrimaryHost.IsRunning {
+		result := make(chan PrimaryResult, 1)
+		go func() {
+			result <- s.WaitForPrimary()
+		}()
+		select {
+		case <-time.After(15 * time.Second):
+			return nil, fmt.Errorf("timeout waiting for primary server")
+		case r := <-result:
+			if s.PrimaryHost.IsRunning {
+				return r.PrimaryHost, r.Err
+			}
+		}
+	}
+	return s.PrimaryHost, nil
+}
 
 func (s *Service) GetNextServer() (*Server, error) {
 	s.Mutex.Lock()

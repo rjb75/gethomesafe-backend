@@ -82,7 +82,14 @@ func formatRequest(c *gin.Context, r *config.Route) {
 func (g *Gateway) Proxy(r config.Route, s *config.Service) gin.HandlerFunc {
 	fmt.Println(r, s.Host)
 	return func(c *gin.Context) {
-		host, err := s.GetNextServer()
+		var host *config.Server
+		var err error
+
+		if s.ReplicationMode == "primary-leader" {
+			host, err = s.GetPrimaryServer(s.PrimaryHost)
+		} else {
+			host, err = s.GetNextServer()
+		}
 
 		if err != nil {
 			fmt.Println("Error getting server", err.Error())
