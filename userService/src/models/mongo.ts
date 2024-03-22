@@ -4,7 +4,7 @@ export const dbClient =  (() => {
     let client: Db;
 
     const createClient = () => {
-        const url = process.env.USER_MONGO_URL;
+        const url = process.env.MONGO_CONNECTION_STRING;
         const dbName = process.env.USER_DB_NAME;
 
         if (!url) {

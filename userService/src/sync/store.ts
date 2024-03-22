@@ -41,6 +41,11 @@ class SyncStore {
         return this.running;
     }
 
+    isLeader(): boolean {
+        if (this.leaderHostname === undefined) return false;
+        return this.id === Number(this.leaderHostname.split('-')[2])
+    }
+
     getHosts(): string[] {
         return this.hosts.filter((host) => Number(host.split('-')[2]) !== this.id);
     }

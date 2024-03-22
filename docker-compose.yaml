@@ -27,6 +27,8 @@ services:
     build:
       context: ./userService
       dockerfile: Dockerfile
+    ports:
+      - 3000:3000
     volumes:
       - .userService/:/src
     env_file:
@@ -44,6 +46,8 @@ services:
     build:
       context: ./userService
       dockerfile: Dockerfile
+    ports:
+      - 3001:3000
     volumes:
       - .userService/:/src
     env_file:
@@ -61,6 +65,8 @@ services:
     build:
       context: ./userService
       dockerfile: Dockerfile
+    ports:
+      - 3002:3000
     volumes:
       - .userService/:/src
     env_file:
