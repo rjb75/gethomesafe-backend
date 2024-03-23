@@ -1,7 +1,8 @@
 version: "3.6"
 
 services:
-  gateway:
+  gateway-1:
+    hostname: gateway-1
     build:
       context: ./gateway
       dockerfile: Dockerfile
@@ -9,6 +10,27 @@ services:
       - .env
     ports:
       - 8080:8080
+    depends_on:
+      - test-service
+      - test-service-2
+      - user-service-0
+      - user-service-1
+      - user-service-2
+      - party-query-service-0
+      - party-query-service-1
+      - party-query-service-2
+      - party-command-service-0
+      - party-command-service-1
+      - party-command-service-2
+  gateway-2:
+    hostname: gateway-2
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - 8081:8080
     depends_on:
       - test-service
       - test-service-2

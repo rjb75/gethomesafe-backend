@@ -5,6 +5,7 @@ import "sync"
 type Config struct {
 	Services []Service `json:"services"`
 	Port     int       `json:"port"`
+	Gateways []string  `json:"gateways"`
 }
 
 type Route struct {

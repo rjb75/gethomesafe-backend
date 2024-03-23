@@ -20,7 +20,11 @@ func main() {
 		panic(err)
 	}
 
-	gateway.Init()
+	err = gateway.Init()
+	if err != nil {
+		panic(err)
+	}
+
 	err = gateway.LoadConfig("services.json")
 
 	if err != nil {
@@ -28,5 +32,6 @@ func main() {
 	}
 
 	gateway.RegisterRoutes()
+	gateway.StartTimestampSync()
 	gateway.Run(":8080")
 }

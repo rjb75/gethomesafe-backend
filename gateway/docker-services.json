@@ -1,5 +1,9 @@
 {
   "port": 8080,
+  "gateways": [
+    "gateway-1",
+    "gateway-2"
+  ],
   "services": [
     {
       "name": "testService",

@@ -2,6 +2,8 @@ package gateway
 
 import (
 	"fmt"
+	"os"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rjb75/gethomesafe-backend/gateway/auth"
@@ -11,9 +13,12 @@ import (
 )
 
 type Gateway struct {
-	config *config.Config
-	G      *gin.Engine
-	F      *auth.Firebase
+	config    *config.Config
+	G         *gin.Engine
+	F         *auth.Firebase
+	Timestamp *int64
+	TimeLock  sync.Mutex
+	Name      string
 }
 
 func New() *Gateway {
@@ -60,8 +65,17 @@ func (g *Gateway) InitFirebase() error {
 	return nil
 }
 
-func (g *Gateway) Init() {
+func (g *Gateway) Init() error {
 	g.G = gin.Default()
+	g.SetupTimestamp()
+	name, err := os.Hostname()
+
+	if err != nil {
+		return err
+	}
+	g.Name = name
+	fmt.Println("Gateway name: ", g.Name)
+	return nil
 }
 
 func (g *Gateway) Run(port string) {
