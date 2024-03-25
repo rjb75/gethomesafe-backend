@@ -32,3 +32,7 @@ export const getIsUserHome = async (
 
   return isUserHomeResponse.isUserHome;
 };
+
+export const generateInviteCode = (): string => {
+  return Math.random().toString().substring(2, 6);
+};

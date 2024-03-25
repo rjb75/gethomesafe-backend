@@ -3,6 +3,7 @@ import { CreatePartyRequestBody } from "../controllers/createParty";
 import { dbClient, PARTY_COLLECTION } from "../models/mongo";
 import { Party, User } from "../models/party.model";
 import { v4 as uuidv4 } from "uuid";
+import { generateInviteCode } from "./helper";
 
 type CreatePartyArgs = { hostUserId: string } & CreatePartyRequestBody;
 
@@ -26,7 +27,7 @@ export const createNewParty = async ({
     _id: new ObjectId(),
     name: partyName,
     hostUserId,
-    inviteCode: uuidv4(),
+    inviteCode: generateInviteCode(),
     qrCode: "",
     active: true,
     members: [hostMemberInfo],
