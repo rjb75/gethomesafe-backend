@@ -1,26 +1,34 @@
-export const getIsUserHome = async (userId: string): Promise<boolean> => {
+export const getIsUserHome = async (
+  userToken: string,
+  currentLat: string,
+  currentLong: string
+): Promise<boolean> => {
   const apiGatewayUrl = process.env.API_GATEWAY_URL;
   if (!apiGatewayUrl) {
-    throw new Error("getUserInfo - API_GATEWAY_URL not set");
+    throw new Error("getIsUserHome - API_GATEWAY_URL not set");
   }
 
-  let userInfo: { isUserHome: boolean };
+  let isUserHomeResponse: { isUserHome: boolean };
+
   try {
-    const response = await fetch(`${apiGatewayUrl}/api/isUserHome`, {
-      method: "GET",
-      headers: {
-        "X-User-Id": userId,
-      },
-    });
+    const response = await fetch(
+      `${apiGatewayUrl}/api/isUserHome?currentLat=${currentLat}&currentLong=${currentLong}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: userToken,
+        },
+      }
+    );
 
-    userInfo = await response.json();
+    isUserHomeResponse = await response.json();
   } catch (e) {
-    throw new Error("getUserInfo - Error on fetching user info");
+    throw new Error("getIsUserHome - Error on fetching user info");
   }
 
-  if (!userInfo) {
+  if (!isUserHomeResponse) {
     throw new Error("Failed to get user info");
   }
 
-  return userInfo.isUserHome;
+  return isUserHomeResponse.isUserHome;
 };
