@@ -19,6 +19,7 @@ type Gateway struct {
 	Timestamp *int64
 	TimeLock  sync.Mutex
 	Name      string
+	S         *Synchronization
 }
 
 func New() *Gateway {
@@ -38,6 +39,12 @@ func (g *Gateway) LoadConfig(filename string) error {
 	if err != nil {
 		return err
 	}
+
+	if g.S == nil {
+		g.S = g.NewSynchronization()
+	}
+
+	g.S.Gateways = len(g.config.Gateways)
 
 	return nil
 }
@@ -68,6 +75,7 @@ func (g *Gateway) InitFirebase() error {
 func (g *Gateway) Init() error {
 	g.G = gin.Default()
 	g.SetupTimestamp()
+	g.S = g.NewSynchronization()
 	name, err := os.Hostname()
 
 	if err != nil {

@@ -77,3 +77,9 @@ func (g *Gateway) SetupTimestamp() {
 		}
 	})
 }
+
+func (g *Gateway) GetTimestamp() int64 {
+	g.TimeLock.Lock()
+	defer g.TimeLock.Unlock()
+	return *g.Timestamp
+}

@@ -13,6 +13,7 @@ type Route struct {
 	Path          string `json:"path"`
 	GatewayPath   string `json:"gatewayPath"`
 	Authenticated bool   `json:"authenticated"`
+	Synchronized  bool   `json:"synchronized" default:"false"`
 }
 
 type Service struct {

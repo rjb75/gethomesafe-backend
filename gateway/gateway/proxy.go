@@ -151,3 +151,33 @@ func (g *Gateway) Proxy(r config.Route, s *config.Service) gin.HandlerFunc {
 		c.Data(resp.StatusCode, resp.Header.Get("Content-Type"), body)
 	}
 }
+
+func (g *Gateway) SynchronizedProxy(r config.Route, s *config.Service) gin.HandlerFunc {
+	fmt.Println(r, s.Host)
+
+	return func(c *gin.Context) {
+
+		uuid, err := g.proposeHandler(c)
+
+		fmt.Println("Proposed", uuid, err)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "uuid": uuid})
+		}
+
+		for {
+			if g.S.CanCommit[uuid] {
+				break
+			}
+			time.Sleep(50 * time.Millisecond)
+		}
+
+		g.commitHandler(c, uuid)
+
+		c.Header("X-Action-Id", uuid.String())
+		c.Header("X-Proposer", g.Name)
+		c.Header("X-Timestamp", fmt.Sprintf("%d", g.GetTimestamp()))
+
+		g.Proxy(r, s)(c)
+	}
+}

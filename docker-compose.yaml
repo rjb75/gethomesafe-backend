@@ -30,7 +30,28 @@ services:
     env_file:
       - .env
     ports:
-      - 8081:8080
+      - 8082:8080
+    depends_on:
+      - test-service
+      - test-service-2
+      - user-service-0
+      - user-service-1
+      - user-service-2
+      - party-query-service-0
+      - party-query-service-1
+      - party-query-service-2
+      - party-command-service-0
+      - party-command-service-1
+      - party-command-service-2
+  gateway-3:
+    hostname: gateway-3
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - 8083:8080
     depends_on:
       - test-service
       - test-service-2
