@@ -52,23 +52,25 @@ app.get("/api/leader", (req: Request, res: Response) => {
     res.status(200).send();
 });
 
-setInterval(() => {
-    const leaderHostname = store.getInstance().getLeaderHostname();
-    if (!leaderHostname) {
-        console.log("No current leader")
-        initiateElection()
-    } else {
-        console.log(`Current Leader: ${leaderHostname}`)
-        if (Number(leaderHostname.split('-')[2]) !== store.getInstance().getId()) {
-            healthCheck(leaderHostname).on("error", (err) => {
-                console.log("Healthcheck failed")
-                initiateElection()
-            })
-        }
-    }
-}, 5000)
+syncDB().then(() => {
+    app.listen(port, async () => {
 
-app.listen(port, () => {
     console.log(`User service listening on port ${port}`);
-    syncDB();
-});
+
+    setInterval(() => {
+        const leaderHostname = store.getInstance().getLeaderHostname();
+        if (!leaderHostname) {
+            console.log("No current leader")
+            initiateElection()
+        } else {
+            console.log(`Current Leader: ${leaderHostname}`)
+            if (Number(leaderHostname.split('-')[2]) !== store.getInstance().getId()) {
+                healthCheck(leaderHostname).on("error", (err) => {
+                    console.log("Healthcheck failed")
+                    initiateElection()
+                })
+            }
+        }
+    }, 5000)
+    });
+})

@@ -78,6 +78,8 @@ services:
       - .env
     depends_on:
       - user_mongodb0
+      - user_mongodb1
+      - user_mongodb2
     environment:
       - MONGO_CONNECTION_STRING=${USER_MONGO_URL0}
       - ID=0
@@ -96,7 +98,9 @@ services:
     env_file:
       - .env
     depends_on:
+      - user_mongodb0
       - user_mongodb1
+      - user_mongodb2
     environment:
       - MONGO_CONNECTION_STRING=${USER_MONGO_URL1}
       - ID=1
@@ -115,6 +119,8 @@ services:
     env_file:
       - .env
     depends_on:
+      - user_mongodb0
+      - user_mongodb1
       - user_mongodb2
     environment:
       - MONGO_CONNECTION_STRING=${USER_MONGO_URL2}
