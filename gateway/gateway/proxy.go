@@ -110,6 +110,10 @@ func (g *Gateway) Proxy(r config.Route, s *config.Service) gin.HandlerFunc {
 		for k, v := range c.Request.URL.Query() {
 			params.Set(k, v[len(v)-1])
 		}
+		if s.ReplicationMode == "primary-leader" {
+			params.Set("X-Gateway-Leader", s.PrimaryHost.Host)
+		}
+
 		query.URL.RawQuery = params.Encode()
 
 		client := &http.Client{Timeout: 5 * time.Second}
