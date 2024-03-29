@@ -92,7 +92,7 @@ type Action struct {
 
 func (g *Gateway) handleActions() {
 	for {
-		if len(g.S.PriorityQueue) > 0 {
+		if g.S.PriorityQueue.Len() > 0 {
 			g.S.QueueLock.Lock()
 			req := g.S.PriorityQueue[0]
 			g.S.QueueLock.Unlock()

@@ -18,22 +18,26 @@ func (s *Service) WaitForPrimary() PrimaryResult {
 	}
 }
 
-func (s *Service) GetPrimaryServer(*Server) (*Server, error) {
+func (s *Service) GetPrimaryServer() (*Server, error) {
 	if s.PrimaryHost == nil || !s.PrimaryHost.IsRunning {
 		result := make(chan PrimaryResult, 1)
 		go func() {
 			result <- s.WaitForPrimary()
 		}()
-		select {
-		case <-time.After(15 * time.Second):
-			return nil, fmt.Errorf("timeout waiting for primary server")
-		case r := <-result:
-			if s.PrimaryHost.IsRunning {
-				return r.PrimaryHost, r.Err
+		for {
+			select {
+			case <-time.After(15 * time.Second):
+				return nil, fmt.Errorf("timeout waiting for primary server")
+			case r := <-result:
+				if r.Err != nil {
+					return nil, r.Err
+				}
+				return r.PrimaryHost, nil
 			}
 		}
 	}
 	return s.PrimaryHost, nil
+
 }
 
 func (s *Service) GetNextServer() (*Server, error) {

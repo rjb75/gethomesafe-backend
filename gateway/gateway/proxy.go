@@ -86,7 +86,15 @@ func (g *Gateway) Proxy(r config.Route, s *config.Service) gin.HandlerFunc {
 		var err error
 
 		if s.ReplicationMode == "primary-leader" {
-			host, err = s.GetPrimaryServer(s.PrimaryHost)
+			host, err = s.GetPrimaryServer()
+
+			if err != nil {
+				fmt.Println("Error getting primary server", err.Error())
+				c.JSON(http.StatusServiceUnavailable, gin.H{"error": "Service Unavailable, No Primary Available"})
+				return
+			}
+
+			fmt.Println("Primary host", host.Host, host.Id, err)
 		} else {
 			host, err = s.GetNextServer()
 		}
@@ -111,7 +119,7 @@ func (g *Gateway) Proxy(r config.Route, s *config.Service) gin.HandlerFunc {
 			params.Set(k, v[len(v)-1])
 		}
 		if s.ReplicationMode == "primary-leader" {
-			params.Set("X-Gateway-Leader", s.PrimaryHost.Host)
+			query.Header.Set("X-Gateway-Leader", host.Host)
 		}
 
 		query.URL.RawQuery = params.Encode()

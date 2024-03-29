@@ -17,6 +17,12 @@ func (h *Server) PrimaryCheck(s *Service) bool {
 	fmt.Println("Checking", queryUrl)
 	query, _ := http.NewRequest("GET", queryUrl, nil)
 
+	if s.PrimaryHost != nil {
+		query.Header.Set("X-Gateway-Leader", s.PrimaryHost.Host)
+	} else {
+		query.Header.Set("X-Gateway-Leader", "")
+	}
+
 	client := &http.Client{Timeout: 5 * time.Second}
 	resp, err := client.Do(query)
 
