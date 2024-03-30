@@ -184,6 +184,8 @@ services:
       - .env
     depends_on:
       - party_mongodb0 # We should maybe think about creating a different DB instance for the party query/command services. This way we clearly have multiple dbs.
+      - redis-0
+      - redis-1
     environment:
       - MONGO_CONNECTION_STRING=${PARTY_MONGO_URL}
     expose:
@@ -199,6 +201,8 @@ services:
       - .env
     depends_on:
       - party_mongodb0 # We should maybe think about creating a different DB instance for the party query/command services. This way we clearly have multiple dbs.
+      - redis-0
+      - redis-1
     environment:
       - MONGO_CONNECTION_STRING=${PARTY_MONGO_URL}
     expose:
@@ -214,6 +218,8 @@ services:
       - .env
     depends_on:
       - party_mongodb0 # We should maybe think about creating a different DB instance for the party query/command services. This way we clearly have multiple dbs.
+      - redis-0
+      - redis-1
     environment:
       - MONGO_CONNECTION_STRING=${PARTY_MONGO_URL}
     expose:
@@ -336,6 +342,14 @@ services:
           "host" : "party_mongodb2:27017"
         }
       ] }; rs.initiate(config);'
+  redis-0:
+    image: redis
+    ports:
+      - "6379:6379"
+  redis-1:
+    image: redis
+    ports:
+      - "6380:6379"
 
 volumes:
   user_mongodb0_userData:

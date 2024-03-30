@@ -17,6 +17,7 @@ export const addMemberToParty = async ({
     _id: userId,
     displayName: userDisplayName,
     isHome: false,
+    timestamp: new Date(),
   };
 
   try {
