@@ -18,6 +18,7 @@ export interface MessageStorage {
   currentLong: string;
   userId: string;
   userToken: string;
+  timestamp: string;
 }
 
 const URL_REDIS_CONN_0 = process.env.REDIS_ADDR_0;
@@ -44,7 +45,7 @@ redisClients.forEach((client, index) => {
 
   client.subscribe(LOCATION_CHANNEL, async (message) => {
     const parsedMessage = JSON.parse(message);
-    console.log(`Client ${index} event:`, parsedMessage);
+    console.log(`Client ${index} handling event:`, parsedMessage);
 
     await handleLocationUpdate(parsedMessage);
   });

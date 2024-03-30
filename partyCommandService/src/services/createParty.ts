@@ -21,6 +21,7 @@ export const createNewParty = async ({
     _id: hostUserId,
     displayName: hostDisplayName,
     isHome: false,
+    timestamp: new Date(),
   };
 
   const partyData: Party = {

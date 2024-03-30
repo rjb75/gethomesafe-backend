@@ -26,11 +26,19 @@ export const handleLocationUpdate = async (message: MessageStorage) => {
     const collection = database.collection<Party>(PARTY_COLLECTION);
 
     try {
-      const updatedParty = await collection.updateMany(
-        { active: true, "members._id": message.userId },
-        { $set: { "members.$.isHome": true } }
+      const updatedParty = await collection.findOneAndUpdate(
+        {
+          active: true,
+          "members._id": message.userId,
+          "members.timestamp": { $lt: message.timestamp },
+        },
+        {
+          $set: {
+            "members.$.isHome": true,
+            "members.$.timestamp": message.timestamp,
+          },
+        }
       );
-
       console.log("Updated party result:", updatedParty);
     } catch (e) {
       throw new Error("Error on updating party" + e);
