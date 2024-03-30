@@ -169,7 +169,7 @@ func (g *Gateway) SynchronizedProxy(r config.Route, s *config.Service) gin.Handl
 
 	return func(c *gin.Context) {
 
-		uuid, err := g.proposeHandler(c)
+		uuid, ts, err := g.proposeHandler(c)
 
 		fmt.Println("Proposed", uuid, err)
 
@@ -188,8 +188,71 @@ func (g *Gateway) SynchronizedProxy(r config.Route, s *config.Service) gin.Handl
 
 		c.Header("X-Action-Id", uuid.String())
 		c.Header("X-Proposer", g.Name)
-		c.Header("X-Timestamp", fmt.Sprintf("%d", g.GetTimestamp()))
+		c.Header("X-Timestamp", fmt.Sprintf("%d", ts))
 
 		g.Proxy(r, s)(c)
+	}
+}
+
+func (g *Gateway) PublishProxy(r config.Route, s *config.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var LocationMessage LocationMessage
+
+		if err := c.BindJSON(&LocationMessage); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		uuid, ts, err := g.proposeHandler(c)
+
+		fmt.Println("Proposed", uuid, err)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "uuid": uuid})
+		}
+
+		for {
+			if g.S.CanCommit[uuid] {
+				break
+			}
+			time.Sleep(50 * time.Millisecond)
+		}
+
+		g.commitHandler(c, uuid)
+
+		c.Header("X-Action-Id", uuid.String())
+		c.Header("X-Proposer", g.Name)
+		c.Header("X-Timestamp", fmt.Sprintf("%d", ts))
+		LocationMessage.Timestamp = fmt.Sprintf("%d", ts)
+
+		// set the id header
+		if r.Authenticated {
+			if _, ok := c.Get("uid"); ok {
+				fmt.Println("Setting user id", c.GetString("uid"))
+				c.Request.Header.Set("X-User-Id", c.GetString("uid"))
+				LocationMessage.UserID = c.GetString("uid")
+				LocationMessage.UserToken = c.GetHeader("Authorization")
+			}
+		}
+
+		host, err := s.GetNextRedisServer()
+
+		if err != nil {
+			fmt.Println("Error getting server", err.Error())
+			c.JSON(http.StatusServiceUnavailable, gin.H{"error": "Service Unavailable"})
+			return
+		}
+
+		fmt.Println("Publishing request to", host.Host, host.Id, r.Publish)
+
+		res := host.Redis.Client.Publish(c.Request.Context(), r.Publish, LocationMessage)
+
+		if res.Err() != nil {
+			fmt.Println("Error publishing message", res.Err())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": res.Err().Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Published"})
 	}
 }

@@ -194,7 +194,7 @@ func (g *Gateway) proposalReceiveHandler(proposal Action) {
 	heap.Push(&g.S.PriorityQueue, req)
 }
 
-func (g *Gateway) proposeHandler(c *gin.Context) (uuid.UUID, error) {
+func (g *Gateway) proposeHandler(c *gin.Context) (uuid.UUID, int64, error) {
 	currentTime := g.GetTimestamp()
 	proposer := g.Name
 	actionId := uuid.New()
@@ -214,12 +214,12 @@ func (g *Gateway) proposeHandler(c *gin.Context) (uuid.UUID, error) {
 			}
 			err := sendAction(c.Request.Context(), h, proposed)
 			if err != nil {
-				return uuid.Nil, err
+				return uuid.Nil, currentTime, err
 			}
 		}
 	}
 
-	return actionId, nil
+	return actionId, currentTime, nil
 }
 
 func (g *Gateway) acceptHandler(actionId uuid.UUID) {

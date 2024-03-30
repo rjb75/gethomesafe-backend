@@ -1,6 +1,8 @@
 package config
 
-import "sync"
+import (
+	"sync"
+)
 
 type Config struct {
 	Services []Service `json:"services"`
@@ -14,6 +16,7 @@ type Route struct {
 	GatewayPath   string `json:"gatewayPath"`
 	Authenticated bool   `json:"authenticated"`
 	Synchronized  bool   `json:"synchronized" default:"false"`
+	Publish       string `json:"publish" default:""`
 }
 
 type Service struct {
@@ -29,9 +32,10 @@ type Service struct {
 }
 
 type Server struct {
-	Port      int        `json:"port"`
-	Host      string     `json:"host"`
-	Mutex     sync.Mutex `json:"-"`
-	IsRunning bool       `json:"-"`
-	Id        int        `json:"-"`
+	Port      int           `json:"port"`
+	Host      string        `json:"host"`
+	Mutex     sync.Mutex    `json:"-"`
+	IsRunning bool          `json:"-"`
+	Id        int           `json:"-"`
+	Redis     RedisInstance `json:"-"` // Only used in redis mode
 }

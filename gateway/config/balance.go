@@ -56,6 +56,24 @@ func (s *Service) GetNextServer() (*Server, error) {
 	return &s.Host[s.LastId], nil
 }
 
+func (s *Service) GetNextRedisServer() (*Server, error) {
+	s.Mutex.Lock()
+	if s.LastId >= len(s.Host) {
+		s.LastId = 0
+	}
+	s.Mutex.Unlock()
+	if !s.Host[s.LastId].IsRunning {
+		if s.allServersDown() {
+			return nil, fmt.Errorf("all servers are down")
+		}
+		s.Mutex.Lock()
+		s.LastId++
+		s.Mutex.Unlock()
+		return s.GetNextRedisServer()
+	}
+	return &s.Host[s.LastId], nil
+}
+
 func (s *Service) allServersDown() bool {
 	for i := range s.Host {
 		if s.Host[i].IsRunning {

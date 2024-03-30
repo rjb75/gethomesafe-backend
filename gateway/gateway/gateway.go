@@ -49,6 +49,24 @@ func (g *Gateway) LoadConfig(filename string) error {
 	return nil
 }
 
+// initRedisInstances initializes the Redis instances for each service
+func (g *Gateway) InitRedisInstances() error {
+	for i := range g.config.Services {
+		service := &g.config.Services[i]
+		if service.Protocol == "redis" {
+			for j := range service.Host {
+				host := &service.Host[j]
+				err := host.InitRedisInstance()
+
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
 func (g *Gateway) InitFirebase() error {
 	key := viper.GetString("FIREBASE_API_KEY")
 

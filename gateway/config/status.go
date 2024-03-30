@@ -113,6 +113,18 @@ func (h *Server) StartLeaderCheck(s *Service) {
 	}
 }
 
+func (s *Server) StartRedisCheck() {
+	for {
+		if s.Redis.CheckRedisInstance() == nil {
+			s.SetStatus(true)
+		} else {
+			fmt.Println("Server is down", s.Host, s.Port)
+			s.SetStatus(false)
+		}
+		time.Sleep(time.Duration(time.Duration(rand.Intn(maxHeartbeatTimeout-minHeartbeatTimeout)+minHeartbeatTimeout) * time.Second))
+	}
+}
+
 func (S *Server) SetStatus(status bool) {
 	S.Mutex.Lock()
 	S.IsRunning = status

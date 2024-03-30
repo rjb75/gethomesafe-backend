@@ -161,6 +161,30 @@
           "authenticated": true
         }
       ]
+    },
+    {
+      "name": "locationUpdate",
+      "hosts": [
+        {
+          "host": "redis-0",
+          "port": 6379
+        },
+        {
+          "host": "redis-1",
+          "port": 6379
+        }
+      ],
+      "protocol": "redis",
+      "heartbeat": "/api/heartbeat",
+      "routes": [
+        {
+          "path": "/api/locationUpdate",
+          "gatewayPath": "/api/locationUpdate",
+          "method": "POST",
+          "authenticated": true,
+          "publish": "location"
+        }
+      ]
     }
   ]
 }

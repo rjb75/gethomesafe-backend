@@ -63,7 +63,9 @@ func (g *Gateway) RegisterRoutes() error {
 			service.Host[i].Mutex = sync.Mutex{}
 			service.Host[i].IsRunning = false
 			service.Host[i].Id = i
-			if service.ReplicationMode == "primary-leader" {
+			if service.Protocol == "redis" {
+				go service.Host[i].StartRedisCheck()
+			} else if service.ReplicationMode == "primary-leader" {
 				go service.Host[i].StartLeaderCheck(service)
 			} else {
 				go service.Host[i].StartHeartbeat(service.Heartbeat)
@@ -72,7 +74,19 @@ func (g *Gateway) RegisterRoutes() error {
 
 		for _, route := range service.Routes {
 			if route.Authenticated {
-				if route.Synchronized {
+				if route.Publish != "" {
+					switch route.Method {
+					case "GET":
+						g.G.GET(route.GatewayPath, g.F.AuthMiddleware(), g.PublishProxy(route, service))
+					case "POST":
+						g.G.POST(route.GatewayPath, g.F.AuthMiddleware(), g.PublishProxy(route, service))
+					case "PUT":
+						g.G.PUT(route.GatewayPath, g.F.AuthMiddleware(), g.PublishProxy(route, service))
+					case "DELETE":
+						g.G.DELETE(route.GatewayPath, g.F.AuthMiddleware(), g.PublishProxy(route, service))
+					}
+
+				} else if route.Synchronized {
 					switch route.Method {
 					case "GET":
 						g.G.GET(route.GatewayPath, g.F.AuthMiddleware(), g.SynchronizedProxy(route, service))

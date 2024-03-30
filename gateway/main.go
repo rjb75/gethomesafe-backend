@@ -31,6 +31,11 @@ func main() {
 		panic(err)
 	}
 
+	err = gateway.InitRedisInstances()
+	if err != nil {
+		panic(err)
+	}
+
 	gateway.RegisterRoutes()
 	gateway.StartTimestampSync()
 	gateway.Run(":8080")

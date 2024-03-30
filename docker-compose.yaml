@@ -344,12 +344,16 @@ services:
       ] }; rs.initiate(config);'
   redis-0:
     image: redis
+    expose:
+      - 6379
     ports:
-      - "6379:6379"
+      - "6380:6379"
   redis-1:
     image: redis
     ports:
-      - "6380:6379"
+      - "6381:6379"
+    expose:
+      - 6379
 
 volumes:
   user_mongodb0_userData:
