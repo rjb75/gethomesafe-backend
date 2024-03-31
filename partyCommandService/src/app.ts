@@ -13,11 +13,10 @@ const port = 5000;
 
 app.use(json());
 
-export interface MessageStorage {
-  currentLat: string;
-  currentLong: string;
+export interface RedisMessage {
+  currentLat: number;
+  currentLong: number;
   userId: string;
-  userToken: string;
   timestamp: string;
 }
 
@@ -41,11 +40,13 @@ const redisClient1 = createClient({ url: URL_REDIS_CONN_1 });
 const redisClients = [redisClient0, redisClient1];
 
 redisClients.forEach((client, index) => {
-  client.on("error", (err) => console.log("Redis error on:" + index, err));
+  client.on("error", (err) =>
+    console.log(`Redis client ${index} error: `, err)
+  );
 
   client.subscribe(LOCATION_CHANNEL, async (message) => {
     const parsedMessage = JSON.parse(message);
-    console.log(`Client ${index} handling event:`, parsedMessage);
+    console.log(`Redis Client ${index} handling event:`, parsedMessage);
 
     await handleLocationUpdate(parsedMessage);
   });

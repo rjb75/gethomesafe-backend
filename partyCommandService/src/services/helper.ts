@@ -1,22 +1,54 @@
 export const getIsUserHome = async (
-  userToken: string,
-  currentLat: string,
-  currentLong: string
+  userId: string,
+  currentLat: number,
+  currentLong: number
 ): Promise<boolean> => {
-  const apiGatewayUrl = process.env.API_GATEWAY_URL;
-  if (!apiGatewayUrl) {
-    throw new Error("getIsUserHome - API_GATEWAY_URL not set");
+  const userHosts = process.env.USER_SERVICE_HOSTS;
+  const USER_SERVICE_PORT = 3000;
+
+  if (!userHosts) {
+    throw new Error("getIsUserHome - No user service hosts provided");
   }
 
+  const userHostsList = userHosts.split(",");
+  let userServiceLeaderHost;
   let isUserHomeResponse: { isUserHome: boolean };
 
   try {
+    for (let i = 0; i < userHostsList.length; i++) {
+      const host = userHostsList[i];
+      let heartbeatResponse;
+      try {
+        heartbeatResponse = await fetch(
+          `http://${host}:${USER_SERVICE_PORT}/api/heartbeat`,
+          {
+            method: "GET",
+          }
+        );
+      } catch (e) {
+        console.log("Request failed on host: ", host);
+        console.log("Error: ", e);
+        continue;
+      }
+
+      userServiceLeaderHost = heartbeatResponse.headers.get("X-Primary-Host");
+      if (userServiceLeaderHost) {
+        break;
+      }
+    }
+
+    if (!userServiceLeaderHost) {
+      throw new Error("getIsUserHome - No leader found");
+    }
+
+    console.log("Leader found: ", userServiceLeaderHost);
+
     const response = await fetch(
-      `${apiGatewayUrl}/api/isUserHome?currentLat=${currentLat}&currentLong=${currentLong}`,
+      `http://${userServiceLeaderHost}:${USER_SERVICE_PORT}/api/isUserHome?currentLat=${currentLat}&currentLong=${currentLong}`,
       {
         method: "GET",
         headers: {
-          Authorization: userToken,
+          "X-User-Id": userId,
         },
       }
     );
@@ -29,6 +61,8 @@ export const getIsUserHome = async (
   if (!isUserHomeResponse) {
     throw new Error("Failed to get user info");
   }
+
+  console.log("isUserHomeResponse: ", isUserHomeResponse);
 
   return isUserHomeResponse.isUserHome;
 };

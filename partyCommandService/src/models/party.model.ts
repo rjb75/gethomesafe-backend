@@ -17,5 +17,5 @@ export interface User {
   _id: string;
   displayName: string;
   isHome: boolean;
-  timestamp: Date;
+  timestamp: number;
 }

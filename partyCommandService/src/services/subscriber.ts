@@ -1,19 +1,17 @@
-import { MessageStorage } from "../app";
+import { RedisMessage } from "../app";
 import { PARTY_COLLECTION, dbClient } from "../models/mongo";
 import { Party } from "../models/party.model";
 import { getIsUserHome } from "./helper";
 
-export const handleLocationUpdate = async (message: MessageStorage) => {
+export const handleLocationUpdate = async (message: RedisMessage) => {
   let isHome: boolean = false;
   console.log("Handling location update");
   try {
     isHome = await getIsUserHome(
-      message.userToken,
+      message.userId,
       message.currentLat,
-      message.currentLong
+      message.currentLat
     );
-
-    console.log(message);
   } catch (e) {
     throw new Error("Error on getting user location" + e);
   }
@@ -25,21 +23,31 @@ export const handleLocationUpdate = async (message: MessageStorage) => {
 
     const collection = database.collection<Party>(PARTY_COLLECTION);
 
+    const parsedTimestamp = parseInt(message.timestamp);
     try {
-      const updatedParty = await collection.findOneAndUpdate(
+      const updatedParties = await collection.updateMany(
         {
           active: true,
           "members._id": message.userId,
-          "members.timestamp": { $lt: message.timestamp },
+          "members.timestamp": { $lt: parsedTimestamp },
         },
         {
           $set: {
-            "members.$.isHome": true,
-            "members.$.timestamp": message.timestamp,
+            "members.$[elem].isHome": true,
+            "members.$[elem].timestamp": parsedTimestamp,
           },
+        },
+        {
+          arrayFilters: [
+            {
+              "elem._id": message.userId,
+              "elem.timestamp": { $lt: parsedTimestamp },
+            },
+          ],
         }
       );
-      console.log("Updated party result:", updatedParty);
+
+      console.log("Updated party result:", updatedParties);
     } catch (e) {
       throw new Error("Error on updating party" + e);
     }

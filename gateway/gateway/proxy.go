@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"time"
+	"encoding/json"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rjb75/gethomesafe-backend/gateway/config"
@@ -245,7 +246,15 @@ func (g *Gateway) PublishProxy(r config.Route, s *config.Service) gin.HandlerFun
 
 		fmt.Println("Publishing request to", host.Host, host.Id, r.Publish)
 
-		res := host.Redis.Client.Publish(c.Request.Context(), r.Publish, LocationMessage)
+		messageBytes, err := json.Marshal(LocationMessage)
+
+		if err != nil {
+			fmt.Println("Error marshaling message", err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		res := host.Redis.Client.Publish(c.Request.Context(), r.Publish, messageBytes)
 
 		if res.Err() != nil {
 			fmt.Println("Error publishing message", res.Err())
