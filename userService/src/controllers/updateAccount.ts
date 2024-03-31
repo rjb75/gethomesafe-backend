@@ -8,7 +8,7 @@ import store from "../sync/store";
 export const updateAccount = (req: Request, res: Response) => {
     const syncStore = store.getInstance()
 
-    if (syncStore.isLeader()) {
+    if (syncStore.getHostname() === req.get('X-Gateway-Leader')) {
         const valResult = validationResult(req);
         if (!valResult.isEmpty()) {
             return res.status(300).send(valResult.array());
