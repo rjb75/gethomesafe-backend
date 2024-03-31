@@ -3,7 +3,6 @@ import store from "./store";
 import {dbClient} from "../models/mongo";
 import * as http from "http";
 
-
 export const syncDB = async () => {
     console.log("started db sync")
     const s = store.getInstance();
@@ -34,12 +33,15 @@ export const syncDB = async () => {
     for (let i = 0; i < hosts.length; i++) {
         reqs.push(http.get(`http://${hosts[i]}:3000/api/heartbeat`).on('error', (err) => console.log(err)));
     }
+    reqs.push(new Promise((resolve, reject) => {
+        // Reject after 5 seconds
+        setTimeout(() => reject(new Error("Request timed out")), 5000);
+    }))
 
     let primaryHost: string;
     return Promise.race(reqs).then(async (res) => {
+        // @ts-ignore
         res.on('response', async (res) => {
-            console.log(`headers here ${res.headers["x-primary-host"]}`)
-            console.log(res.headers["x-primary-host"]);
             // @ts-ignore
             primaryHost = res.headers["x-primary-host"]
 
@@ -70,6 +72,16 @@ export const syncDB = async () => {
                 console.log(`remaining bytes to write: ${total - write}`);
             }
 
+            await store.getInstance().applyQueueUpdates();
+            console.log("Applied updates, db ready");
+            store.getInstance().setDBReady(true);
+        })
+
+        // @ts-ignore
+        res.on('error', async () => {
+            console.log("All requests timed out.")
+            const db = dbClient.getClient();
+            await db.dropDatabase();
             await store.getInstance().applyQueueUpdates();
             console.log("Applied updates, db ready");
             store.getInstance().setDBReady(true);

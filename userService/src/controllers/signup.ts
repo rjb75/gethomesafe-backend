@@ -10,7 +10,7 @@ import store from "../sync/store";
 export const signup = (req: Request, res: Response) => {
     const syncStore = store.getInstance()
     console.log(`Signup request, isleader=${syncStore.isLeader()}`)
-  if (syncStore.isLeader()) {
+  if (syncStore.getHostname() === req.get('X-Gateway-Leader')) {
       const valResult = validationResult(req);
       if (!valResult.isEmpty()) {
           return res.status(300).send(valResult.array());
@@ -49,12 +49,13 @@ export const signup = (req: Request, res: Response) => {
           });
   } else {
       const user: User = req.body;
-        console.log(user)
 
       if (syncStore.isDBReady()) {
           createUser(user)
               .then((r) => {
                   res.status(200).send("User Created");
+              }).catch((err) => {
+                  console.log(err)
               })
       } else {
           syncStore.pushToSignupQueue(user);

@@ -36,8 +36,6 @@ app.get("/api/heartbeat", (req: Request, res: Response) => res.status(200).heade
 app.get("/api/election", (req: Request, res: Response) => {
     console.log("received election message");
     const peer_id = req.get("id");
-    console.log(`Peer id: ${peer_id}`);
-    console.log(`My id: ${store.getInstance().getId()}`)
     if (Number(peer_id) < Number(store.getInstance().getId())) {
         res.status(200).send() // Bully
         if (!store.getInstance().getRunning()) {
