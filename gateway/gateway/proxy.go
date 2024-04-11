@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"time"
+	"encoding/json"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rjb75/gethomesafe-backend/gateway/config"
@@ -82,7 +83,22 @@ func formatRequest(c *gin.Context, r *config.Route) {
 func (g *Gateway) Proxy(r config.Route, s *config.Service) gin.HandlerFunc {
 	fmt.Println(r, s.Host)
 	return func(c *gin.Context) {
-		host, err := s.GetNextServer()
+		var host *config.Server
+		var err error
+
+		if s.ReplicationMode == "primary-leader" {
+			host, err = s.GetPrimaryServer()
+
+			if err != nil {
+				fmt.Println("Error getting primary server", err.Error())
+				c.JSON(http.StatusServiceUnavailable, gin.H{"error": "Service Unavailable, No Primary Available"})
+				return
+			}
+
+			fmt.Println("Primary host", host.Host, host.Id, err)
+		} else {
+			host, err = s.GetNextServer()
+		}
 
 		if err != nil {
 			fmt.Println("Error getting server", err.Error())
@@ -103,6 +119,10 @@ func (g *Gateway) Proxy(r config.Route, s *config.Service) gin.HandlerFunc {
 		for k, v := range c.Request.URL.Query() {
 			params.Set(k, v[len(v)-1])
 		}
+		if s.ReplicationMode == "primary-leader" {
+			query.Header.Set("X-Gateway-Leader", host.Host)
+		}
+
 		query.URL.RawQuery = params.Encode()
 
 		client := &http.Client{Timeout: 5 * time.Second}
@@ -142,5 +162,106 @@ func (g *Gateway) Proxy(r config.Route, s *config.Service) gin.HandlerFunc {
 		fmt.Println(body, resp.StatusCode, resp.Header.Get("Content-Type"))
 		c.Header("X-Server-Id", fmt.Sprintf("%d", host.Id))
 		c.Data(resp.StatusCode, resp.Header.Get("Content-Type"), body)
+	}
+}
+
+func (g *Gateway) SynchronizedProxy(r config.Route, s *config.Service) gin.HandlerFunc {
+	fmt.Println(r, s.Host)
+
+	return func(c *gin.Context) {
+
+		uuid, ts, err := g.proposeHandler(c)
+
+		fmt.Println("Proposed", uuid, err)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "uuid": uuid})
+		}
+
+		for {
+			if g.S.CanCommit[uuid] {
+				break
+			}
+			time.Sleep(50 * time.Millisecond)
+		}
+
+		g.commitHandler(c, uuid)
+
+		c.Header("X-Action-Id", uuid.String())
+		c.Header("X-Proposer", g.Name)
+		c.Header("X-Timestamp", fmt.Sprintf("%d", ts))
+
+		g.Proxy(r, s)(c)
+	}
+}
+
+func (g *Gateway) PublishProxy(r config.Route, s *config.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var LocationMessage LocationMessage
+
+		if err := c.BindJSON(&LocationMessage); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		uuid, ts, err := g.proposeHandler(c)
+
+		fmt.Println("Proposed", uuid, err)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "uuid": uuid})
+		}
+
+		for {
+			if g.S.CanCommit[uuid] {
+				break
+			}
+			time.Sleep(50 * time.Millisecond)
+		}
+
+		g.commitHandler(c, uuid)
+
+		c.Header("X-Action-Id", uuid.String())
+		c.Header("X-Proposer", g.Name)
+		c.Header("X-Timestamp", fmt.Sprintf("%d", ts))
+		LocationMessage.Timestamp = fmt.Sprintf("%d", ts)
+
+		// set the id header
+		if r.Authenticated {
+			if _, ok := c.Get("uid"); ok {
+				fmt.Println("Setting user id", c.GetString("uid"))
+				c.Request.Header.Set("X-User-Id", c.GetString("uid"))
+				LocationMessage.UserID = c.GetString("uid")
+				LocationMessage.UserToken = c.GetHeader("Authorization")
+			}
+		}
+
+		host, err := s.GetNextRedisServer()
+
+		if err != nil {
+			fmt.Println("Error getting server", err.Error())
+			c.JSON(http.StatusServiceUnavailable, gin.H{"error": "Service Unavailable"})
+			return
+		}
+
+		fmt.Println("Publishing request to", host.Host, host.Id, r.Publish)
+
+		messageBytes, err := json.Marshal(LocationMessage)
+
+		if err != nil {
+			fmt.Println("Error marshaling message", err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		res := host.Redis.Client.Publish(c.Request.Context(), r.Publish, messageBytes)
+
+		if res.Err() != nil {
+			fmt.Println("Error publishing message", res.Err())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": res.Err().Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Published"})
 	}
 }

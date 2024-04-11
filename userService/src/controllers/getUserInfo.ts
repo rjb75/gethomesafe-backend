@@ -4,6 +4,8 @@ import {validationResult} from "express-validator";
 import {getUser} from "../services/getUser";
 
 export const getUserInfo = (req: Request, res: Response) => {
+    console.log("gateway thinks leader is", req.headers['x-gateway-leader'])
+
     const valResult = validationResult(req);
     if (!valResult.isEmpty()) {
         return res.status(300).send(valResult.array());

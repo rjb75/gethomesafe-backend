@@ -5,9 +5,9 @@ export const joinPartyValidationSchema = checkSchema({
     in: ["body"],
     isString: true,
     isLength: {
-      options: { min: 36, max: 36 },
+      options: { min: 6, max: 6 },
     },
-    errorMessage: "Invite code must be a string with length of 36",
+    errorMessage: "Invite code must be a string with length of 6",
   },
   userDisplayName: {
     in: ["body"],

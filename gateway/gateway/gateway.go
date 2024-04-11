@@ -2,6 +2,8 @@ package gateway
 
 import (
 	"fmt"
+	"os"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rjb75/gethomesafe-backend/gateway/auth"
@@ -11,9 +13,13 @@ import (
 )
 
 type Gateway struct {
-	config *config.Config
-	G      *gin.Engine
-	F      *auth.Firebase
+	config    *config.Config
+	G         *gin.Engine
+	F         *auth.Firebase
+	Timestamp *int64
+	TimeLock  sync.Mutex
+	Name      string
+	S         *Synchronization
 }
 
 func New() *Gateway {
@@ -34,6 +40,30 @@ func (g *Gateway) LoadConfig(filename string) error {
 		return err
 	}
 
+	if g.S == nil {
+		g.S = g.NewSynchronization()
+	}
+
+	g.S.Gateways = len(g.config.Gateways)
+
+	return nil
+}
+
+// initRedisInstances initializes the Redis instances for each service
+func (g *Gateway) InitRedisInstances() error {
+	for i := range g.config.Services {
+		service := &g.config.Services[i]
+		if service.Protocol == "redis" {
+			for j := range service.Host {
+				host := &service.Host[j]
+				err := host.InitRedisInstance()
+
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
 	return nil
 }
 
@@ -60,8 +90,18 @@ func (g *Gateway) InitFirebase() error {
 	return nil
 }
 
-func (g *Gateway) Init() {
+func (g *Gateway) Init() error {
 	g.G = gin.Default()
+	g.SetupTimestamp()
+	g.S = g.NewSynchronization()
+	name, err := os.Hostname()
+
+	if err != nil {
+		return err
+	}
+	g.Name = name
+	fmt.Println("Gateway name: ", g.Name)
+	return nil
 }
 
 func (g *Gateway) Run(port string) {

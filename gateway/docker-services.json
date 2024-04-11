@@ -1,5 +1,10 @@
 {
   "port": 8080,
+  "gateways": [
+    "gateway-1",
+    "gateway-2",
+    "gateway-3"
+  ],
   "services": [
     {
       "name": "testService",
@@ -15,12 +20,20 @@
       ],
       "protocol": "http",
       "heartbeat": "/api/heartbeat",
+      "replicationMode": "round-robin",
       "routes": [
         {
           "path": "/test",
           "method": "GET",
           "gatewayPath": "/test",
           "authenticated": false
+        },
+        {
+          "path": "/test",
+          "method": "GET",
+          "gatewayPath": "/testsync",
+          "authenticated": false,
+          "synchronized": true
         },
         {
           "path": "/test",
@@ -48,6 +61,7 @@
       ],
       "protocol": "http",
       "heartbeat": "/api/heartbeat",
+      "replicationMode": "primary-leader",
       "routes": [
         {
           "path": "/api/signup",
@@ -93,6 +107,7 @@
       ],
       "protocol": "http",
       "heartbeat": "/api/heartbeat",
+      "replicationMode": "round-robin",
       "routes": [
         {
           "path": "/api/partyInvite",
@@ -144,6 +159,30 @@
           "gatewayPath": "/api/join-party",
           "method": "POST",
           "authenticated": true
+        }
+      ]
+    },
+    {
+      "name": "locationUpdate",
+      "hosts": [
+        {
+          "host": "redis-0",
+          "port": 6379
+        },
+        {
+          "host": "redis-1",
+          "port": 6379
+        }
+      ],
+      "protocol": "redis",
+      "heartbeat": "/api/heartbeat",
+      "routes": [
+        {
+          "path": "/api/locationUpdate",
+          "gatewayPath": "/api/locationUpdate",
+          "method": "POST",
+          "authenticated": true,
+          "publish": "location"
         }
       ]
     }

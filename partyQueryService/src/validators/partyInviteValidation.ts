@@ -5,8 +5,8 @@ export const partyInviteValidationSchema = checkSchema({
     in: ["query"],
     isString: true,
     isLength: {
-      options: { min: 36, max: 36 },
+      options: { min: 6, max: 6 },
     },
-    errorMessage: "Party code must be a string with length of 36",
+    errorMessage: "Party code must be a string with length of 6",
   },
 });
