@@ -18,6 +18,7 @@ export interface RedisMessage {
   currentLong: number;
   userId: string;
   timestamp: string;
+  userToken: string;
 }
 
 const URL_REDIS_CONN_0 = process.env.REDIS_ADDR_0;
