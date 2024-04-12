@@ -48,15 +48,18 @@
       "hosts": [
         {
           "host": "user-service-0",
-          "port": 3000
+          "port": 3000,
+          "name": "user-service-0"
         },
         {
           "host": "user-service-1",
-          "port": 3000
+          "port": 3000,
+          "name": "user-service-1"
         },
         {
           "host": "user-service-2",
-          "port": 3000
+          "port": 3000,
+          "name": "user-service-2"
         }
       ],
       "protocol": "http",

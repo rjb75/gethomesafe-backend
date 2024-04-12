@@ -15,6 +15,12 @@ type Services struct {
 	Services map[string]config.Service `json:"services"`
 }
 
+func (g *Gateway) registerHeartbeatRoutes() {
+	g.G.GET("/api/heartbeat", func(ctx *gin.Context) {
+		ctx.JSON(200, gin.H{"status": "ok"})
+	})
+}
+
 func (g *Gateway) registerSynchronizationRoutes() {
 	g.G.GET("/sync", func(ctx *gin.Context) {
 		context := ctx.Request.Context()
@@ -55,6 +61,7 @@ func (g *Gateway) RegisterRoutes() error {
 		return fmt.Errorf("config is nil")
 	}
 
+	g.registerHeartbeatRoutes()
 	g.registerSynchronizationRoutes()
 
 	for j := range g.config.Services {
