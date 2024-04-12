@@ -3,10 +3,7 @@ export const getIsUserHome = async (
   currentLat: number,
   currentLong: number
 ): Promise<boolean> => {
-  const gatewayHosts =
-    process.env.ENVIRONMENT === "development"
-      ? process.env.GATEWAY_SERVICE_HOSTS_DEV
-      : process.env.GATEWAY_SERVICE_HOSTS;
+  const gatewayHosts = process.env.GATEWAY_SERVICE_HOSTS;
 
   if (!gatewayHosts) {
     throw new Error("getIsUserHome - No gateway service hosts provided");
