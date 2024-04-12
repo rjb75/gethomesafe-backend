@@ -38,4 +38,5 @@ type Server struct {
 	IsRunning bool          `json:"-"`
 	Id        int           `json:"-"`
 	Redis     RedisInstance `json:"-"` // Only used in redis mode
+	Name      string        `json:"name"`
 }
