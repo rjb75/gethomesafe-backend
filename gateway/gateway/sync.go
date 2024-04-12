@@ -158,7 +158,7 @@ func (g *Gateway) acceptReceiveHandler(accept Action) {
 	g.S.Accepted[accept.ActionId] = g.S.Accepted[accept.ActionId] + 1
 	fmt.Println("Accepted", accept.ActionId, "from", accept.Proposer, "total", g.S.Accepted[accept.ActionId], "of", g.S.Gateways)
 
-	if g.S.Accepted[accept.ActionId] >= g.S.Gateways {
+	if g.S.Accepted[accept.ActionId] >= g.S.Gateways-1 {
 		g.S.CanCommit[accept.ActionId] = true
 		fmt.Println("Can commit", accept.ActionId)
 	}
@@ -214,7 +214,7 @@ func (g *Gateway) proposeHandler(c *gin.Context) (uuid.UUID, int64, error) {
 			}
 			err := sendAction(c.Request.Context(), h, proposed)
 			if err != nil {
-				return uuid.Nil, currentTime, err
+				fmt.Println("Failed to send propose to", h, ":", err)
 			}
 		}
 	}
@@ -242,6 +242,8 @@ func (g *Gateway) acceptHandler(actionId uuid.UUID) {
 func (g *Gateway) commitHandler(c *gin.Context, actionId uuid.UUID) {
 	proposer := g.Name
 
+	localCount := 0
+
 	// Commit to all other gateways
 	for _, h := range g.config.Gateways {
 		if h != g.Name {
@@ -253,8 +255,9 @@ func (g *Gateway) commitHandler(c *gin.Context, actionId uuid.UUID) {
 			}
 			err := sendAction(c.Request.Context(), h, commit)
 			if err != nil {
-				c.JSON(500, gin.H{"error": err.Error()})
-				return
+				fmt.Println("Failed to send commit to", h, ":", err)
+			} else {
+				localCount++
 			}
 		}
 	}
