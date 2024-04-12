@@ -120,7 +120,7 @@ func (g *Gateway) Proxy(r config.Route, s *config.Service) gin.HandlerFunc {
 			params.Set(k, v[len(v)-1])
 		}
 		if s.ReplicationMode == "primary-leader" {
-			query.Header.Set("X-Gateway-Leader", host.Host)
+			query.Header.Set("X-Gateway-Leader", host.Name)
 		}
 
 		query.URL.RawQuery = params.Encode()

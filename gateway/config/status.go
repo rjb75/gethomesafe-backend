@@ -18,7 +18,7 @@ func (h *Server) PrimaryCheck(s *Service) bool {
 	query, _ := http.NewRequest("GET", queryUrl, nil)
 
 	if s.PrimaryHost != nil {
-		query.Header.Set("X-Gateway-Leader", s.PrimaryHost.Host)
+		query.Header.Set("X-Gateway-Leader", s.PrimaryHost.Name)
 	} else {
 		query.Header.Set("X-Gateway-Leader", "")
 	}
@@ -54,8 +54,8 @@ func (h *Server) PrimaryCheck(s *Service) bool {
 	}
 
 	for i := range s.Host {
-		if s.Host[i].Host == primary {
-			fmt.Println("Primary server found", s.Host[i].Host)
+		if s.Host[i].Name == primary {
+			fmt.Println("Primary server found", s.Host[i].Name)
 			s.Mutex.Lock()
 			s.PrimaryHost = &s.Host[i]
 			s.Mutex.Unlock()
