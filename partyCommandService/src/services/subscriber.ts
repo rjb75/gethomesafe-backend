@@ -8,7 +8,7 @@ export const handleLocationUpdate = async (message: RedisMessage) => {
   console.log("Handling location update");
   try {
     isHome = await getIsUserHome(
-      message.userId,
+      message.userToken,
       message.currentLat,
       message.currentLat
     );

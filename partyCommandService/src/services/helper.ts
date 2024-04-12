@@ -1,54 +1,47 @@
 export const getIsUserHome = async (
-  userId: string,
+  token: string,
   currentLat: number,
   currentLong: number
 ): Promise<boolean> => {
-  const userHosts = process.env.USER_SERVICE_HOSTS;
-  const USER_SERVICE_PORT = 3000;
+  const gatewayHosts = process.env.GATEWAY_SERVICE_HOSTS;
 
-  if (!userHosts) {
-    throw new Error("getIsUserHome - No user service hosts provided");
+  if (!gatewayHosts) {
+    throw new Error("getIsUserHome - No gateway service hosts provided");
   }
 
-  const userHostsList = userHosts.split(",");
-  let userServiceLeaderHost;
+  const gatewayHostsList = gatewayHosts.split(",");
+  let gatewayServiceHost;
   let isUserHomeResponse: { isUserHome: boolean };
 
   try {
-    for (let i = 0; i < userHostsList.length; i++) {
-      const host = userHostsList[i];
-      let heartbeatResponse;
+    for (let i = 0; i < gatewayHostsList.length; i++) {
+      const host = gatewayHostsList[i];
       try {
-        heartbeatResponse = await fetch(
-          `http://${host}:${USER_SERVICE_PORT}/api/heartbeat`,
-          {
-            method: "GET",
-          }
-        );
+        await fetch(`${host}/api/heartbeat`, {
+          method: "GET",
+        });
       } catch (e) {
         console.log("Request failed on host: ", host);
         console.log("Error: ", e);
         continue;
       }
 
-      userServiceLeaderHost = heartbeatResponse.headers.get("X-Primary-Host");
-      if (userServiceLeaderHost) {
-        break;
-      }
+      gatewayServiceHost = host;
+      break;
     }
 
-    if (!userServiceLeaderHost) {
-      throw new Error("getIsUserHome - No leader found");
+    if (!gatewayServiceHost) {
+      throw new Error("getIsUserHome - no response from gateway hosts");
     }
 
-    console.log("Leader found: ", userServiceLeaderHost);
+    console.log("Gateway host found: ", gatewayServiceHost);
 
     const response = await fetch(
-      `http://${userServiceLeaderHost}:${USER_SERVICE_PORT}/api/isUserHome?currentLat=${currentLat}&currentLong=${currentLong}`,
+      `${gatewayServiceHost}/api/isUserHome?currentLat=${currentLat}&currentLong=${currentLong}`,
       {
         method: "GET",
         headers: {
-          "X-User-Id": userId,
+          Authorization: token,
         },
       }
     );
